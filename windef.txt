@@ -1,9 +1,3 @@
-# Запуск PowerShell с правами администратора
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "Пожалуйста, запустите этот скрипт от имени администратора." -ForegroundColor Red
-    exit
-}
-
 # Удаление компонентов Windows Defender
 try {
     # Удаляем службу Windows Defender
