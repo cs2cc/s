@@ -1,22 +1,66 @@
+# Запуск PowerShell с правами администратора
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host "Пожалуйста, запустите этот скрипт от имени администратора." -ForegroundColor Red
+    exit
+}
+
+# Функция для проверки состояния защиты в режиме реального времени
+function Check-RealTimeMonitoring {
+    param (
+        [string]$message
+    )
+    $realTimeMonitoring = Get-MpPreference | Select-Object -ExpandProperty DisableRealtimeMonitoring
+    Write-Host "$message: $realTimeMonitoring" -ForegroundColor Yellow
+}
+
+# Проверяем текущее состояние защиты в режиме реального времени
+Check-RealTimeMonitoring -message "Текущее состояние защиты в режиме реального времени"
+
 # Отключаем реальный защитник
-Set-MpPreference -DisableRealtimeMonitoring $true
+Set-MpPreference -DisableRealtimeMonitoring $true -ErrorAction SilentlyContinue
+
+# Проверяем состояние после изменения
+Check-RealTimeMonitoring -message "Состояние защиты в режиме реального времени после изменения"
+
+# Если защита в режиме реального времени всё ещё включена, пробуем остановить службу
+if ((Get-MpPreference).DisableRealtimeMonitoring -eq $false) {
+    Write-Host "Защита в режиме реального времени не отключена. Пробуем остановить службу Windows Defender..." -ForegroundColor Red
+
+    # Останавливаем службу Windows Defender
+    try {
+        Stop-Service -Name WinDefend -Force
+        Write-Host "Служба Windows Defender остановлена." -ForegroundColor Green
+    } catch {
+        Write-Host "Не удалось остановить службу Windows Defender: $_" -ForegroundColor Red
+    }
+
+    # Отключаем автозагрузку службы Windows Defender
+    try {
+        Set-Service -Name WinDefend -StartupType Disabled
+        Write-Host "Автозагрузка службы Windows Defender отключена." -ForegroundColor Green
+    } catch {
+        Write-Host "Не удалось отключить автозагрузку службы Windows Defender: $_" -ForegroundColor Red
+    }
+} else {
+    Write-Host "Защита в режиме реального времени успешно отключена через настройки." -ForegroundColor Green
+}
 
 # Отключаем обнаружение вредоносных программ
-Set-MpPreference -DisableBehaviorMonitoring $true
+Set-MpPreference -DisableBehaviorMonitoring $true -ErrorAction SilentlyContinue
 
 # Отключаем защиту от угроз
-Set-MpPreference -DisableIOAVProtection $true
+Set-MpPreference -DisableIOAVProtection $true -ErrorAction SilentlyContinue
 
 # Отключаем защиту эксплуатации
-Set-MpPreference -DisableScriptScanning $true
+Set-MpPreference -DisableScriptScanning $true -ErrorAction SilentlyContinue
 
 # Отключаем автоматическое определение и удаление вредоносного ПО
-Set-MpPreference -DisableBlockAtFirstSeen $true
+Set-MpPreference -DisableBlockAtFirstSeen $true -ErrorAction SilentlyContinue
 
 # Отключаем отправку образцов файлов Microsoft
-Set-MpPreference -SubmitSamplesConsent 2
+Set-MpPreference -SubmitSamplesConsent 2 -ErrorAction SilentlyContinue
 
 # Отключаем отправку отчетов о вредоносных программах
-Set-MpPreference -MAPSReporting 0
+Set-MpPreference -MAPSReporting 0 -ErrorAction SilentlyContinue
 
-Write-Host "Windows Defender отключен."
+Write-Host "Дополнительные настройки Windows Defender отключены." -ForegroundColor Green
