@@ -1,15 +1,28 @@
-# Удаление компонентов Windows Defender
 try {
-    # Удаляем службу Windows Defender
-    Stop-Service -Name WinDefend -Force
-    Set-Service -Name WinDefend -StartupType Disabled
-    Write-Host "Служба Windows Defender отключена." -ForegroundColor Green
-}
+    # Удаление службы Windows Defender
+    $service = Get-Service -Name WinDefend -ErrorAction SilentlyContinue
+    if ($service) {
+        Stop-Service -Name WinDefend -Force
+        Set-Service -Name WinDefend -StartupType Disabled
+        Write-Host "Служба Windows Defender отключена." -ForegroundColor Green
+    } else {
+        Write-Host "Служба Windows Defender не найдена." -ForegroundColor Red
+    }
 
     # Удаление папок и файлов Windows Defender
-    Remove-Item -Path "C:\ProgramData\Microsoft\Windows Defender" -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item -Path "C:\Program Files\Windows Defender" -Recurse -Force -ErrorAction SilentlyContinue
-    Write-Host "Файлы Windows Defender удалены." -ForegroundColor Green
+    $defenderPaths = @(
+        "C:\ProgramData\Microsoft\Windows Defender",
+        "C:\Program Files\Windows Defender"
+    )
+
+    foreach ($path in $defenderPaths) {
+        if (Test-Path $path) {
+            Remove-Item -Path $path -Recurse -Force -ErrorAction Stop
+            Write-Host "Файлы из пути $path удалены." -ForegroundColor Green
+        } else {
+            Write-Host "Путь $path не найден." -ForegroundColor Yellow
+        }
+    }
 } catch {
     Write-Host "Ошибка при удалении файлов или отключении службы Windows Defender: $_" -ForegroundColor Red
 }
