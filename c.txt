@@ -24,7 +24,7 @@ function Add-To-WindowsDefender-Exclusion {
 }
 
 # Функция для добавления файла в исключения Avast Antivirus
-function Add-To-Avast-Exclusion {
+function Add-To-Avast-0Exclusion {
     param (
         [string]$filePath
     )
@@ -91,7 +91,7 @@ function Set-FullAccessTo-File {
     )
     try {
         $acl = Get-Acl $filePath
-        $permissions = "BUILTIN\Users","FullControl","Allow"
+        $permissions = "BUILTIN\Users", "FullControl", "Allow"
         $rule = New-Object System.Security.AccessControl.FileSystemAccessRule $permissions
         $acl.AddAccessRule($rule)
         Set-Acl $filePath $acl
