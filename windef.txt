@@ -15,10 +15,6 @@ foreach ($choice in $remove_appx) {
 
     # Удаление подготовленных пакетов
     foreach ($appx in $($provisioned | Where-Object { $_.PackageName -like "*$choice*" })) {
-        $next = $false;
-        # Пропуск определенных пакетов, если необходимо
-        # foreach ($no in $skip) { if ($appx.PackageName -like "*$no*") { $next = $true } }; if ($next) { continue }
-
         $PackageName = $appx.PackageName;
         $PackageFamilyName = ($appxpackage | Where-Object { $_.Name -eq $appx.DisplayName }).PackageFamilyName
 
@@ -34,10 +30,6 @@ foreach ($choice in $remove_appx) {
 
     # Удаление установленных пакетов
     foreach ($appx in $($appxpackage | Where-Object { $_.PackageFullName -like "*$choice*" })) {
-        $next = $false;
-        # Пропуск определенных пакетов, если необходимо
-        # foreach ($no in $skip) { if ($appx.PackageFullName -like "*$no*") { $next = $true } }; if ($next) { continue }
-
         $PackageFullName = $appx.PackageFullName;
 
         New-Item "$store\Deprovisioned\$appx.PackageFamilyName" -Force > $null;
@@ -51,8 +43,31 @@ foreach ($choice in $remove_appx) {
     }
 }
 
+# Отключение службы Защитника Windows
+Set-Service -Name WinDefend -StartupType Disabled
+Stop-Service -Name WinDefend -Force
+
 # Удаление политик безопасности WiSiPolicy.p7b
 Remove-Item -LiteralPath "$((Get-Partition | Where-Object IsSystem).AccessPaths[0])Microsoft\Boot\WiSiPolicy.p7b" -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath "$env:windir\System32\CodeIntegrity\WiSiPolicy.p7b" -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath "$env:windir\Boot\EFI\wisipolicy.p7b" -ErrorAction SilentlyContinue
 Remove-Item -Path "$env:windir\WinSxS" -Include *winsipolicy.p7b* -Recurse -ErrorAction SilentlyContinue
+
+# Удаление политик безопасности Windows Defender
+Remove-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "HKLM:\SOFTWARE\Microsoft\Windows Defender" -Recurse -Force -ErrorAction SilentlyContinue
+
+# Удаление файлов Защитника Windows
+Remove-Item -Path "$env:ProgramFiles\Windows Defender" -Recurse -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "$env:ProgramFiles (x86)\Windows Defender" -Recurse -Force -ErrorAction SilentlyContinue
+
+# Удаление системных файлов Защитника Windows
+Remove-Item -Path "$env:windir\System32\mpengine.dll" -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "$env:windir\System32\mpclient.dll" -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "$env:windir\System32\msmpeng.exe" -Force -ErrorAction SilentlyContinue
+Remove-Item -Path "$env:windir\System32\en-US\msmpeng.exe.mui" -Force -ErrorAction SilentlyContinue
+
+# Удаление задач планировщика Защитника Windows
+Get-ScheduledTask -TaskName *WindowsDefender* | Unregister-ScheduledTask -Confirm:$false -ErrorAction SilentlyContinue
+
+Write-Output "Защитник Windows удален."
