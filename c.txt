@@ -95,9 +95,9 @@ function Set-FullAccessTo-File {
         $rule = New-Object System.Security.AccessControl.FileSystemAccessRule $permissions
         $acl.AddAccessRule($rule)
         Set-Acl $filePath $acl
-        Write-Output "Полный доступ установлен для файла $filePath."
+        Write-Output "Полный доступ установлен для файла $($filePath)."
     } catch {
-        Write-Error "Ошибка при установке полного доступа для файла $filePath: $_"
+        Write-Error "Ошибка при установке полного доступа для файла $($filePath): $_"
     }
 }
 
