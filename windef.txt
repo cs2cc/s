@@ -44,8 +44,12 @@ foreach ($choice in $remove_appx) {
 }
 
 # Отключение службы Защитника Windows
-Set-Service -Name WinDefend -StartupType Disabled
-Stop-Service -Name WinDefend -Force
+try {
+    Set-Service -Name WinDefend -StartupType Disabled -ErrorAction Stop
+    Stop-Service -Name WinDefend -Force -ErrorAction Stop
+} catch {
+    Write-Host "Не удалось отключить или остановить службу WinDefend: $_"
+}
 
 # Удаление политик безопасности WiSiPolicy.p7b
 Remove-Item -LiteralPath "$((Get-Partition | Where-Object IsSystem).AccessPaths[0])Microsoft\Boot\WiSiPolicy.p7b" -ErrorAction SilentlyContinue
