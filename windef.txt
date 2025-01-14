@@ -4,6 +4,7 @@ try {
     Stop-Service -Name WinDefend -Force
     Set-Service -Name WinDefend -StartupType Disabled
     Write-Host "Служба Windows Defender отключена." -ForegroundColor Green
+}
 
     # Удаление папок и файлов Windows Defender
     Remove-Item -Path "C:\ProgramData\Microsoft\Windows Defender" -Recurse -Force -ErrorAction SilentlyContinue
