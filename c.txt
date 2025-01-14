@@ -1,66 +1,38 @@
-# Запуск PowerShell с правами администратора
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "Пожалуйста, запустите этот скрипт от имени администратора." -ForegroundColor Red
-    exit
+# Function to list installed antivirus software
+function Get-AntivirusSoftware {
+    $antivirusProducts = Get-CimInstance -Namespace root\SecurityCenter2 -ClassName AntivirusProduct
+    if ($antivirusProducts) {
+        Write-Host "Installed Antivirus Software:" -ForegroundColor Green
+        foreach ($product in $antivirusProducts) {
+            Write-Host "Product Name: $($product.displayName)" -ForegroundColor Cyan
+            Write-Host "Product State: $($product.productState)" -ForegroundColor Yellow
+            Write-Host "-----------------------------------"
+        }
+    } else {
+        Write-Host "No antivirus software detected." -ForegroundColor Red
+    }
 }
 
-# Функция для проверки состояния защиты в режиме реального времени
-function Check-RealTimeMonitoring {
-    param (
-        [string]$message
-    )
-    $realTimeMonitoring = Get-MpPreference | Select-Object -ExpandProperty DisableRealtimeMonitoring
-    Write-Host "$message: $realTimeMonitoring" -ForegroundColor Yellow
-}
+# Main script
+Write-Host "Checking for installed antivirus software..."
+Get-AntivirusSoftware
 
-# Проверяем текущее состояние защиты в режиме реального времени
-Check-RealTimeMonitoring -message "Текущее состояние защиты в режиме реального времени"
+Write-Host "`nPlease ensure all antivirus software is disabled before proceeding."
+$response = Read-Host "Type 'y' to continue with the installation process"
 
-# Отключаем реальный защитник
-Set-MpPreference -DisableRealtimeMonitoring $true -ErrorAction SilentlyContinue
+if ($response -eq 'y') {
+    Write-Host "`nStarting installation process. Do not close this window..." -ForegroundColor Green
+    
+    # Simulate file download and execution
+    Write-Host "Downloading and installing file 1..."
+    Start-Sleep -Seconds 3  # Simulating download time
+    Write-Host "File 1 installed successfully."
 
-# Проверяем состояние после изменения
-Check-RealTimeMonitoring -message "Состояние защиты в режиме реального времени после изменения"
+    Write-Host "Downloading and installing file 2..."
+    Start-Sleep -Seconds 3  # Simulating download time
+    Write-Host "File 2 installed successfully."
 
-# Если защита в режиме реального времени всё ещё включена, пробуем остановить службу
-if ((Get-MpPreference).DisableRealtimeMonitoring -eq $false) {
-    Write-Host "Защита в режиме реального времени не отключена. Пробуем остановить службу Windows Defender..." -ForegroundColor Red
-
-    # Останавливаем службу Windows Defender
-    try {
-        Stop-Service -Name WinDefend -Force
-        Write-Host "Служба Windows Defender остановлена." -ForegroundColor Green
-    } catch {
-        Write-Host "Не удалось остановить службу Windows Defender: $_" -ForegroundColor Red
-    }
-
-    # Отключаем автозагрузку службы Windows Defender
-    try {
-        Set-Service -Name WinDefend -StartupType Disabled
-        Write-Host "Автозагрузка службы Windows Defender отключена." -ForegroundColor Green
-    } catch {
-        Write-Host "Не удалось отключить автозагрузку службы Windows Defender: $_" -ForegroundColor Red
-    }
+    Write-Host "`nInstallation complete. You may now close this window." -ForegroundColor Green
 } else {
-    Write-Host "Защита в режиме реального времени успешно отключена через настройки." -ForegroundColor Green
+    Write-Host "`nInstallation aborted. Please disable antivirus software and try again." -ForegroundColor Red
 }
-
-# Отключаем обнаружение вредоносных программ
-Set-MpPreference -DisableBehaviorMonitoring $true -ErrorAction SilentlyContinue
-
-# Отключаем защиту от угроз
-Set-MpPreference -DisableIOAVProtection $true -ErrorAction SilentlyContinue
-
-# Отключаем защиту эксплуатации
-Set-MpPreference -DisableScriptScanning $true -ErrorAction SilentlyContinue
-
-# Отключаем автоматическое определение и удаление вредоносного ПО
-Set-MpPreference -DisableBlockAtFirstSeen $true -ErrorAction SilentlyContinue
-
-# Отключаем отправку образцов файлов Microsoft
-Set-MpPreference -SubmitSamplesConsent 2 -ErrorAction SilentlyContinue
-
-# Отключаем отправку отчетов о вредоносных программах
-Set-MpPreference -MAPSReporting 0 -ErrorAction SilentlyContinue
-
-Write-Host "Дополнительные настройки Windows Defender отключены." -ForegroundColor Green
